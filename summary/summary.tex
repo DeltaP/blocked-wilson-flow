@@ -1,0 +1,121 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{color}
+
+\begin{document}
+
+\title{Wilson Flow MCRG}
+\author{Gregory Petropoulos}
+\date{\today}
+\maketitle
+
+\section{Background}
+
+The idea is to use wilson flow to move the configuration toward the renormalized trajectory before blocking.
+The hope is that because we start blocking on the renormalized trajectory we can use the same blocking scheme for the entire analysis and get a unique step scaling function.
+
+\section{Procedure}
+
+
+\section{Partial Results for $\Delta\beta$}
+
+As before some values of t match off of the range of $\beta$ that we currently have on the smaller volumes.  
+The relevant matching is contained in the range of small $\beta$.
+
+\section{Partial Results for optimal smearing time}
+
+Figures \ref{fig:7.0_0}-\ref{fig:7.0_4} are the plots showing how matching is affected by smearing for matching on $\beta = 7.0$.
+Figures \ref{fig:7.4_0} - \ref{fig:7.4_4} are the plots showing how matching is affected by smearing for $\beta=7.4$.
+In all cases by the time I match the large volume blocked three times ({\color{blue}blue}) to the small volume blocked twice the smearing is no longer relevant to finding delta beta.
+Also, unlike with regular MCRG here I have also shown the matching for the large volume blocked once ({\color{red}red}) and the small volume not blocked at all.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.0_0}.png}
+  \caption{$\beta = 7.0$ loop 0}
+  \label{fig:7.0_0}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.0_1}.png}
+  \caption{$\beta = 7.0$ loop 1}
+  \label{fig:fig:7.0_1}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.0_2}.png}
+  \caption{$\beta = 7.0$ loop 2}
+  \label{fig:fig:7.0_2}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.0_3}.png}
+  \caption{$\beta = 7.0$ loop 3}
+  \label{fig:7.0_3}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.0_4}.png}
+  \caption{$\beta = 7.0$ loop 4}
+  \label{fig:7.0_4}
+\end{figure}
+
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.4_0}.png}
+  \caption{$\beta = 7.4$ loop 0}
+  \label{fig:7.4_0}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.4_1}.png}
+  \caption{$\beta = 7.4$ loop 1}
+  \label{fig:7.4_1}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.4_2}.png}
+  \caption{$\beta = 7.4$ loop 2}
+  \label{fig:7.4_2}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.4_3}.png}
+  \caption{$\beta = 7.4$ loop 3}
+  \label{fig:7.4_3}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=4in]{{../Plots/smearing_time/7.4_4}.png}
+  \caption{$\beta = 7.4$ loop 4}
+  \label{fig:7.4_4}
+\end{figure}
+
+\section{In Progress and To Do}
+\subsection{In Progress} 
+\begin{enumerate}
+  \item Generating $\beta=8.0$ for 24x48 m = 0.0
+  \item Generating $\beta=7.6$ for 12x24 m = 0.0
+\end{enumerate}
+
+\subsection{To Do}
+
+\begin{enumerate}
+  \item Measure $\beta=8.0$ for 24x48 m = 0.0
+  \item Measure $\beta=7.4$, 7.6 for 12x24 m = 0.0
+  \item Add finding t optimal and $\Delta\beta$ optimal to script
+  \item Add full jackknife analysis
+\end{enumerate}
+\end{document}
