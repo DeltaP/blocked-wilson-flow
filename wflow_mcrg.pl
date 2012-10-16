@@ -39,7 +39,7 @@ foreach my $vol ($SmallV, $LargeV) {
     my @lines = grep{$_=~/^LOOPS/} @in;                                           # greps for lines with the header LOOPS
     foreach my $l (@lines) {                                                      # loops through matched lines
       my @split = split(/\s+/, $l);                                               # splits matched lines
-      if ($split[1] > 0.5) {next;}                                                # some of the files have legacy mistake t's that are too large
+      if ($split[1] > 0.4) {next;}                                                # some of the files have legacy mistake t's that are too large
       push(@{$val{$vol}{$beta}{$split[1]}{$split[2]}{$split[4]}}, $split[6]);     # reads data into hash
       if (!grep{$_ eq $split[1]} @smearingt) {                                    # fills the smearing time array
         push(@smearingt, $split[1]);
@@ -64,12 +64,12 @@ print"File Read in Complete!\n";
 
 print"Finding Delta Beta:\n";
 foreach my $block (@{$block{$LargeV}}) {                                    
-  if ($block == 0) {next;}                                                  # skips no matching on the large volume
+  if ($block == 0) {next;}                                                        # skips no matching on the large volume
   foreach my $t (@smearingt) {
     print"... Large blocking:  $block\tSmearing Time: $t\n";
     foreach my $loop (0,1,2,3,4) {
       foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
-        my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                                  # large volume value at large volume beta
+        my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                 # large volume value at large volume beta
         my @x1 = @{$Beta{$SmallV}};                                               # arrays for plots
         my @y1 = ();
         my @e1 = ();
@@ -119,7 +119,7 @@ foreach my $block (@{$block{$LargeV}}) {
         my @roots=poly_roots($a,($b-$lv_value));                                  # solves for the difference between the fit and the large mass value
         my $beta_diff;
         foreach my $r (@roots){
-          $Full_delta_beta{$block}{$largeb}{$loop}{$t} = $largeb - $r;      # gets the right root
+          $Full_delta_beta{$block}{$largeb}{$loop}{$t} = $largeb - $r;            # gets the right root
           $beta_diff = $r;                                                        # right now only written for linear fit
         }
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
@@ -178,15 +178,15 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     
     my $chart = Chart::Gnuplot->new(                    #Create chart object 
       output => "Plots/smearing_time/${largeb}_${loop}.png",
-      title  => "Alpha optimal given beta ${largeb}",
-      xlabel => "Alpha",
+      title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
+      xlabel => "Smearing Time",
       ylabel => "Delta Beta",
     );
     $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
     $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
-    $chart->command("set label 1 \"Alpha Optimal:  #\"");
+    $chart->command("set label 1 \"Optimal Smearing Time:  #\"");
     $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
-    $chart->command("set label 2 \"Delta Beta Optimal:  #\"");
+    $chart->command("set label 2 \"Optimal Delta Beta:     #\"");
     $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
     my $dataSet1 = Chart::Gnuplot::DataSet->new(        #Create dataset object for small volumes
       xdata => \@x,
