@@ -24,6 +24,7 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
+  print"here\n";
   my $base_name = "4flav_${vol}/BlockedWflow_low_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}}.";
   my @files = <$base_name*>;                                                      # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
