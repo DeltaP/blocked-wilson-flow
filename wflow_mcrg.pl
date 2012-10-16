@@ -181,7 +181,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
-      yrange => [-1,1]
+      yrange => [0,1]
     );
     $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
     $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
