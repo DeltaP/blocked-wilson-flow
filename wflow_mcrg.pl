@@ -156,6 +156,8 @@ foreach my $block (@{$block{$LargeV}}) {
 }
 print"Finding Delta Beta Complete!\n";
 
+my (%T_optimal, %Delt_beta_optimal) = ();
+
 print"Finding Optimal Smearing Time:\n";
 foreach my $largeb (@{$Beta{$LargeV}}) {
   print"... Beta:  $largeb\n";
