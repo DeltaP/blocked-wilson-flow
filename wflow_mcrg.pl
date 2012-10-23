@@ -156,7 +156,7 @@ foreach my $block (@{$block{$LargeV}}) {
 }
 print"Finding Delta Beta Complete!\n";
 
-my (%T_optimal, %Delt_beta_optimal) = ();
+my (%T_optimal, %Delta_beta_optimal) = ();
 
 print"Finding Optimal Smearing Time:\n";
 foreach my $largeb (@{$Beta{$LargeV}}) {
@@ -197,7 +197,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       if ($r =~ /i$/){next;}                                                      # skips imaginary roots
       $T_optimal{$loop}{$largeb}=$r;
       $Delta_beta_optimal{$loop}{$largeb}=$a1*$r+$b1;
-      print"$loop\t$r\t$Delta_beta_optimal{$label}{$largeb}\n";
+      print"$loop\t$r\t$Delta_beta_optimal{$loop}{$largeb}\n";
     }
     
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
