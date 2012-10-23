@@ -175,8 +175,30 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       push(@y2,$Full_delta_beta{2}{$largeb}{$loop}{$t});
       push(@y3,$Full_delta_beta{3}{$largeb}{$loop}{$t});
     }
+
+    my @xf=@smearingt[($index-1)..$index];
+    my @yf1=@y2[($index-1)..$index];
+    my @yf2=@y3[($index-1)..$index];
+    my $x1=pdl(@xf);                                                              # puts data into a piddle for fitting
+    my $y1=pdl(@yf1);
+    my $x2=pdl(@xf);                                                              # puts data into a piddle for fitting
+    my $y2=pdl(@yf2);
+    (my $fit1,my $coeffs1)=fitpoly1d $x1, $y1, 2;                                 # fits the data
+    (my $fit2,my $coeffs2)=fitpoly1d $x2, $y2, 2;
+    my $b1=$coeffs1->at(0);                                                       # extracts out the coefficients
+    my $a1=$coeffs1->at(1);
+    my $b2=$coeffs2->at(0);      
+    my $a2=$coeffs2->at(1);
+
+    my @roots=poly_roots($a1-$a2,$b1-$b2);                                        # finds intersection i.e. optimal smearing time
+    foreach my $r (@roots) {
+      if ($r =~ /i$/){next;}                                                      # skips imaginary roots
+      $T_optimal{$loop}{$largeb}=$r;
+      $Delta_beta_optimal{$loop}{$largeb}=$a1*$r+$b1;
+      print"$loop\t$r\t$Delta_beta_optimal{$label}{$largeb}\n";
+    }
     
-    my $chart = Chart::Gnuplot->new(                    #Create chart object 
+    my $chart = Chart::Gnuplot->new(                                              # Create chart object 
       output => "Plots/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
@@ -185,26 +207,34 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     );
     $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
     $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
-    $chart->command("set label 1 \"Optimal Smearing Time:  #\"");
+    $chart->command("set label 1 \"Optimal Smearing Time:  $T_optimal{$loop}{$largeb}\"");
     $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
-    $chart->command("set label 2 \"Optimal Delta Beta:     #\"");
+    $chart->command("set label 2 \"Optimal Delta Beta:     $Delta_beta_optimal{$loop}{$largeb}\"");
     $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
-    my $dataSet1 = Chart::Gnuplot::DataSet->new(        #Create dataset object for small volumes
+    my $dataSet1 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for small volumes
       xdata => \@x,
       ydata => \@y1,
       title => "Large volume blocked once: ${loop}",
     );
-    my $dataSet2 = Chart::Gnuplot::DataSet->new(        #Create dataset object for large volume
+    my $dataSet2 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for large volume
       xdata => \@x,
       ydata => \@y2,
       title => "Large volume blocked twice: ${loop}",
     );
-    my $dataSet3 = Chart::Gnuplot::DataSet->new(        #Create dataset object for the fit
+    my $dataSet3 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
       xdata => \@x,
       ydata => \@y3,
       title => "Large volume blocked thrice: ${loop}",
     );
-    $chart->plot2d($dataSet1, $dataSet2, $dataSet3);
+    my $dataSet4 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a1*x+$b1",
+      title => "Fit: Blocked Twice",
+    );
+    my $dataSet5 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a2*x+$b2",
+      title => "Fit: Blocked Thrice",
+    );
+    $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
   }
 }
 print"Finding Optimal Smearing Time Complete!\n";
