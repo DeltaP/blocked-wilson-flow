@@ -10,10 +10,11 @@ use PDL::Fit::Polynomial;
 use Math::Polynomial::Solve qw(poly_roots);
 use Chart::Gnuplot;
 
-my $SmallV = $ARGV[0];                                                            # reads in command line arguments
-my $SmallM = $ARGV[1];
-my $LargeV = $ARGV[2];
-my $LargeM = $ARGV[3];
+my $NF     = $ARGV[0];
+my $SmallV = $ARGV[1];                                                            # reads in command line arguments
+my $SmallM = $ARGV[2];
+my $LargeV = $ARGV[3];
+my $LargeM = $ARGV[4];
 my %Mass = (
   "$SmallV" => "$SmallM",
   "$LargeV" => "$LargeM",
@@ -24,7 +25,7 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
-  my $base_name = "4flav_${vol}/BlockedWflow_low_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}.";
+  my $base_name = "${NF}flav_${vol}/BlockedWflow_low_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}.";
   my @files = <$base_name*>;                                                      # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
@@ -123,7 +124,7 @@ foreach my $block (@{$block{$LargeV}}) {
           $beta_diff = $r;                                                        # right now only written for linear fit
         }
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-          output => "Plots/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+          output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
           xlabel => "Beta",
           ylabel => "Expectation Value",
@@ -201,7 +202,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     }
     
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-      output => "Plots/smearing_time/${largeb}_${loop}.png",
+      output => "Plots_${NF}flav/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
