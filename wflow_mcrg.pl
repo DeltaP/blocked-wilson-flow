@@ -171,7 +171,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     my $die = 0;
     foreach my $t (@smearingt) {
       my $diff = $Full_delta_beta{2}{$largeb}{$loop}{$t} - $Full_delta_beta{3}{$largeb}{$loop}{$t};
-      if (($diff < 0) && ($die == 0)) {$index = $count; $die = 1}
+      if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
       $count ++;
       push(@y1,$Full_delta_beta{1}{$largeb}{$loop}{$t});
       push(@y2,$Full_delta_beta{2}{$largeb}{$loop}{$t});
