@@ -44,10 +44,10 @@ foreach my $vol ($SmallV, $LargeV) {
     close IN;
     my $tmax = (($L*$C)**2)/8;
     my @split = grep{$_=~/^WFLOW $tmax/} @in;                                     # greps for lines with the header LOOPS
-    push(@{$val{$vol}{$beta}}, (128*$pi**2*$split[4])/(3*(3^2-1)(1+$delta_c)));                                        # reads data into hash
+    push(@{$val{$vol}{$beta}}, (128*$pi**2*$split[4])/(3*(3^2-1)(1+$delta_c)));   # reads data into hash
   }
   foreach my $beta (@{$Beta{$vol}}) {
-    $avg{$vol}{$beta} = stat_mod::avg(@{$val{$vol}{$beta}{$t}{$loop}{$b}});     # to find statistics
+    $avg{$vol}{$beta} = stat_mod::avg(@{$val{$vol}{$beta}{$t}{$loop}{$b}});       # to find statistics
     $err{$vol}{$beta} = stat_mod::stdev(@{$val{$vol}{$beta}{$t}{$loop}{$b}});
   }
 }
@@ -56,7 +56,7 @@ print"File Read in Complete!\n";
 print"Finding Beta Function:\n";
 foreach my $block (@{$block{$LargeV}}) {                                    
   print"... Large blocking:  $block\tSmearing Time: $t\n";
-  foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
+  foreach my $largeb (@{$Beta{$LargeV}}) {                                        # loops over large volume beta
         my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                 # large volume value at large volume beta
         my @x1 = @{$Beta{$SmallV}};                                               # arrays for plots
         my @y1 = ();
@@ -164,7 +164,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       push(@y3,$Full_delta_beta{3}{$largeb}{$loop}{$t});
     }
     
-    my $chart = Chart::Gnuplot->new(                    #Create chart object 
+    my $chart = Chart::Gnuplot->new(                                              # Create chart object 
       output => "Plots/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
@@ -177,17 +177,17 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
     $chart->command("set label 2 \"Optimal Delta Beta:     #\"");
     $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
-    my $dataSet1 = Chart::Gnuplot::DataSet->new(        #Create dataset object for small volumes
+    my $dataSet1 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for small volumes
       xdata => \@x,
       ydata => \@y1,
       title => "Large volume blocked once: ${loop}",
     );
-    my $dataSet2 = Chart::Gnuplot::DataSet->new(        #Create dataset object for large volume
+    my $dataSet2 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for large volume
       xdata => \@x,
       ydata => \@y2,
       title => "Large volume blocked twice: ${loop}",
     );
-    my $dataSet3 = Chart::Gnuplot::DataSet->new(        #Create dataset object for the fit
+    my $dataSet3 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
       xdata => \@x,
       ydata => \@y3,
       title => "Large volume blocked thrice: ${loop}",
