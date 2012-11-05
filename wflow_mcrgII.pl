@@ -90,8 +90,8 @@ foreach my $block (@{$block{$LargeV}}) {
           push(@e2, $err{$LargeV}{$largeb}{$t}{$loop}{$block});
         }
         my $spline=new Math::Spline(\@y1,\@x1);
-        $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$spline->evaluate($lv_value);
-        my $smallb = $largeb-$Full_delta_beta{$block}{$largeb}{$loop}{$t};
+        my $smallb =$spline->evaluate($lv_value);
+        $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$largeb-$smallb;
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
           output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
