@@ -119,7 +119,7 @@ foreach my $block (@{$block{$LargeV}}) {
           func => "$spline->evaluate(x)",
           title => "Fit to Small Volume",
         );
-        $chart->plot2d($dataSet0, $dataSet1);                          # plots the chart
+        $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
       }
     }
   }
