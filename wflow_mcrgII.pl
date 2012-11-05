@@ -92,6 +92,7 @@ foreach my $block (@{$block{$LargeV}}) {
         my $spline=new Math::Spline(\@y1,\@x1);
         my $smallb =$spline->evaluate($lv_value);
         $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$largeb-$smallb;
+        spline=new Math::Spline(\@x1,\@y1);
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
           output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
@@ -115,10 +116,10 @@ foreach my $block (@{$block{$LargeV}}) {
           title => "Large Volume Observable: ${loop}",
           style => "yerrorbars",
         );
-        #my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-          #func => "$a*x+$b",
-          #title => "Fit to Small Volume",
-        #);
+        my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
+          func => "$spline->evaluate(x)",
+          title => "Fit to Small Volume",
+        );
         $chart->plot2d($dataSet0, $dataSet1);                          # plots the chart
       }
     }
