@@ -92,7 +92,7 @@ foreach my $block (@{$block{$LargeV}}) {
         my $spline=new Math::Spline(\@y1,\@x1);
         my $smallb =$spline->evaluate($lv_value);
         $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$largeb-$smallb;
-        spline=new Math::Spline(\@x1,\@y1);
+        $spline=new Math::Spline(\@x1,\@y1);
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
           output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
