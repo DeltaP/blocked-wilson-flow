@@ -120,7 +120,7 @@ foreach my $block (@{$block{$LargeV}}) {
           ydata => \@x1,
           title => "Small Volume inverse",
         );
-        $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
+        $chart->plot2d($dataSet0, $dataSet1);                          # plots the chart
       }
     }
   }
