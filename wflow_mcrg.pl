@@ -162,6 +162,7 @@ my (%T_optimal, %Delta_beta_optimal) = ();
 print"Finding Optimal Smearing Time:\n";
 foreach my $largeb (@{$Beta{$LargeV}}) {
   print"... Beta:  $largeb\n";
+  my (@t_opt, @b_opt) = ();
   foreach my $loop (0,1,2,3,4) {
     my @x = @smearingt;
     my @y1 = ();
@@ -199,8 +200,10 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       $T_optimal{$loop}{$largeb}=$r;
       $Delta_beta_optimal{$loop}{$largeb}=$a1*$r+$b1;
       print"$loop\t$r\t$Delta_beta_optimal{$loop}{$largeb}\n";
+      push(@t_opt,$r);
+      push(@b_opt, $a1*$r+$b1);
     }
-    
+
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
       output => "Plots_${NF}flav/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
@@ -239,5 +242,9 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
   }
+
+  my $b_avg = stat_mod::avg(@b_opt);
+  my $b_std = stat_mod::stdev(@b_opt);
+  print"AVG $b_avg\tSTDEV $b_std\n";
 }
 print"Finding Optimal Smearing Time Complete!\n";
