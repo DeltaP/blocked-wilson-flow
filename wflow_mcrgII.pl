@@ -117,8 +117,9 @@ foreach my $block (@{$block{$LargeV}}) {
           style => "yerrorbars",
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-          func => "$spline->evaluate(x)",
-          title => "Fit to Small Volume",
+          xdata => \@y1,
+          ydata => \@x1,
+          title => "Small Volume inverse",
         );
         $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
       }
