@@ -5,6 +5,7 @@ use warnings;
 # This version is going to use spline fitting for delta beta
 
 use lib '/Users/gregpetrop/perl5/lib/perl5/darwin-thread-multi-2level';
+use lib '~/slink/Perl/site/lib';
 use lib '/Users/gregpetrop/perl5/lib/perl5';
 use lib::stat_mod qw(:DEFAULT);
 use PDL;

@@ -114,10 +114,12 @@ foreach my $block (@{$block{$LargeV}}) {
         my $x=pdl(@x);                                                            # puts small volume data into piddle for fitting
         my $y=pdl(@y);
         my $e=pdl(@e);
-        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 2;                                # fits the small volumes
-        my $a=$coeffs->at(1);                                                     # extracts out the coefficients
-        my $b=$coeffs->at(0);
-        my @roots=poly_roots($a,($b-$lv_value));                                  # solves for the difference between the fit and the large mass value
+        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 4;                                # fits the small volumes
+        my $a=$coeffs->at(3);                                                     # extracts out the coefficients
+        my $b=$coeffs->at(2);
+        my $c=$coeffs->at(1);
+        my $d=$coeffs->at(0);
+        my @roots=poly_roots($a,$b,$c,($d-$lv_value));                                  # solves for the difference between the fit and the large mass value
         my $beta_diff;
         foreach my $r (@roots){
           $Full_delta_beta{$block}{$largeb}{$loop}{$t} = $largeb - $r;            # gets the right root
@@ -147,7 +149,7 @@ foreach my $block (@{$block{$LargeV}}) {
           style => "yerrorbars",
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-          func => "$a*x+$b",
+          func => "$a*x**3+$b*x**2+$c*x+$d",
           title => "Fit to Small Volume",
         );
         $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
