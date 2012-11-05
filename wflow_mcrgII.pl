@@ -147,9 +147,9 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       push(@y3,$Full_delta_beta{3}{$largeb}{$loop}{$t});
     }
 
-    my @xf=@smearingt[($index-1)..$index];
-    my @yf1=@y2[($index-1)..$index];
-    my @yf2=@y3[($index-1)..$index];
+    my @xf=@smearingt[($index-2)..$index+1];
+    my @yf1=@y2[($index-2)..$index+1];
+    my @yf2=@y3[($index-2)..$index+1];
     my $x1=pdl(@xf);                                                              # puts data into a piddle for fitting
     my $y1=pdl(@yf1);
     my $x2=pdl(@xf);                                                              # puts data into a piddle for fitting
