@@ -92,6 +92,13 @@ foreach my $block (@{$block{$LargeV}}) {
         my $smallb =$spline->evaluate($lv_value);
         $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$largeb-$smallb;
         $spline=new Math::Spline(\@x1,\@y1);
+        my @interp= ();
+        my @xx=();
+        for( my $i=4.0; $i<5; $i+=0.01) {
+          push(@interp, $spline->evaluate($i));
+          push(@xx, $i);
+        }
+
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
           output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
@@ -116,8 +123,8 @@ foreach my $block (@{$block{$LargeV}}) {
           style => "yerrorbars",
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-          xdata => \@y1,
-          ydata => \@x1,
+          xdata => \@xx,
+          ydata => \@interp,
           title => "Small Volume inverse",
         );
         $chart->plot2d($dataSet0, $dataSet1);                          # plots the chart
