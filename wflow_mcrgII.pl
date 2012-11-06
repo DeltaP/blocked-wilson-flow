@@ -91,10 +91,9 @@ foreach my $block (@{$block{$LargeV}}) {
         my $spline=new Math::Spline(\@y1,\@x1);
         my $smallb =$spline->evaluate($lv_value);
         $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$largeb-$smallb;
-        $spline=new Math::Spline(\@x1,\@y1);
         my @interp= ();
         my @xx=();
-        for( my $i=4.0; $i<5; $i+=0.01) {
+        for( my $i=-2.0; $i<2; $i+=0.01) {
           push(@interp, $spline->evaluate($i));
           push(@xx, $i);
         }
@@ -123,8 +122,8 @@ foreach my $block (@{$block{$LargeV}}) {
           style => "yerrorbars",
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-          xdata => \@xx,
-          ydata => \@interp,
+          xdata => \@interp,
+          ydata => \@xx,
           title => "Small Volume inverse",
         );
         $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
