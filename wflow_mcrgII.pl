@@ -94,7 +94,7 @@ foreach my $block (@{$block{$LargeV}}) {
         $Full_delta_beta{$block}{$largeb}{$loop}{$t}=$largeb-$smallb;
         my @interp= ();
         my @xx=();
-        for( my $i=-2.0; $i<2; $i+=0.01) {
+        for( my $i=-0.5; $i<2.5; $i+=0.01) {
           push(@interp, $spline->evaluate($i));
           push(@xx, $i);
         }
