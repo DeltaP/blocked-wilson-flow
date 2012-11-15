@@ -25,8 +25,10 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/BlockedWflow_low_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}.";
-  my @files = <$base_name*>;                                                      # globs for file names
+  my $base_name = "${NF}flav_${vol}/BlockedWflow_";
+  #my $base_name = "${NF}flav_${vol}/BlockedWflow_\[high|low\]_${vol}_*_-0.25_$Mass{$vol}.";
+  #my @files = grep { /BlockedWflow_high_${vol}_*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my @files = grep { /BlockedWflow_(high|low)_${vol}_*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -40,7 +42,7 @@ foreach my $vol ($SmallV, $LargeV) {
     my @lines = grep{$_=~/^LOOPS/} @in;                                           # greps for lines with the header LOOPS
     foreach my $l (@lines) {                                                      # loops through matched lines
       my @split = split(/\s+/, $l);                                               # splits matched lines
-      if ($split[1] > 0.4) {next;}                                                # some of the files have legacy mistake t's that are too large
+      if (($split[1] < 0.1) || ($split[1] > 0.4)) {next;}                                                # some of the files have legacy mistake t's that are too large
       push(@{$val{$vol}{$beta}{$split[1]}{$split[2]}{$split[4]}}, $split[6]);     # reads data into hash
       if (!grep{$_ eq $split[1]} @smearingt) {                                    # fills the smearing time array
         push(@smearingt, $split[1]);
@@ -114,17 +116,26 @@ foreach my $block (@{$block{$LargeV}}) {
         my $x=pdl(@x);                                                            # puts small volume data into piddle for fitting
         my $y=pdl(@y);
         my $e=pdl(@e);
-        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 4;                                # fits the small volumes
-        my $a=$coeffs->at(3);                                                     # extracts out the coefficients
-        my $b=$coeffs->at(2);
-        my $c=$coeffs->at(1);
-        my $d=$coeffs->at(0);
-        my @roots=poly_roots($a,$b,$c,($d-$lv_value));                                  # solves for the difference between the fit and the large mass value
+        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 2;                                # fits the small volumes
+        my $a=$coeffs->at(1);                                                     # extracts out the coefficients
+        my $b=$coeffs->at(0);
+        #my $a=$coeffs->at(3);                                                     # extracts out the coefficients
+        #my $b=$coeffs->at(2);
+        #my $c=$coeffs->at(1);
+        #my $d=$coeffs->at(0);
+        my @roots=poly_roots($a,($b-$lv_value));                                  # solves for the difference between the fit and the large mass value
         my $beta_diff;
+        #my $hasroot = 0;
         foreach my $r (@roots){
+          #if (($r < 4.0)||($r =~ /i$/)){next;}          #skips imaginary roots
+          #if (($r < $Beta{$SmallV}[0])||($r =~ /i$/)){next;}          #skips imaginary roots
           $Full_delta_beta{$block}{$largeb}{$loop}{$t} = $largeb - $r;            # gets the right root
           $beta_diff = $r;                                                        # right now only written for linear fit
+          #$hasroot++;
         }
+        #if ($hasroot == 0) {
+          #$Full_delta_beta{$block}{$largeb}{$loop}{$t}="NaN";
+        #}
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
           output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
@@ -135,7 +146,9 @@ foreach my $block (@{$block{$LargeV}}) {
         $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
         $chart->command("set label 1 \"Delta Beta:  $Full_delta_beta{$block}{$largeb}{$loop}{$t}\"");
         $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
-        $chart->command("set arrow from $largeb,$lv_value to $beta_diff,$lv_value");
+        #if ($hasroot > 0) {
+          #$chart->command("set arrow from $largeb,$lv_value to $beta_diff,$lv_value");
+        #}
         my $dataSet0 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for small volumes
           xdata => \@x1,
           ydata => [\@y1, \@e1],
@@ -149,7 +162,8 @@ foreach my $block (@{$block{$LargeV}}) {
           style => "yerrorbars",
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-          func => "$a*x**3+$b*x**2+$c*x+$d",
+          #func => "$a*x**3+$b*x**2+$c*x+$d",
+          func => "$a*x+$b",
           title => "Fit to Small Volume",
         );
         $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
@@ -174,7 +188,9 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     my $index = 0;
     my $die = 0;
     foreach my $t (@smearingt) {
-      my $diff = $Full_delta_beta{2}{$largeb}{$loop}{$t} - $Full_delta_beta{3}{$largeb}{$loop}{$t};
+      my $diff;
+      if (($Full_delta_beta{2}{$largeb}{$loop}{$t} =~ "NaN") || ($Full_delta_beta{3}{$largeb}{$loop}{$t} =~ "NaN")){$diff="NaN";}
+      $diff = $Full_delta_beta{2}{$largeb}{$loop}{$t} - $Full_delta_beta{3}{$largeb}{$loop}{$t};
       if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
       $count ++;
       push(@y1,$Full_delta_beta{1}{$largeb}{$loop}{$t});
@@ -211,7 +227,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
-      yrange => [0,1]
+      #yrange => [0,1]
     );
     $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
     $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
