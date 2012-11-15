@@ -28,7 +28,7 @@ foreach my $vol ($SmallV, $LargeV) {
   my $base_name = "${NF}flav_${vol}/BlockedWflow_";
   #my $base_name = "${NF}flav_${vol}/BlockedWflow_\[high|low\]_${vol}_*_-0.25_$Mass{$vol}.";
   #my @files = grep { /BlockedWflow_high_${vol}_*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
-  my @files = grep { /BlockedWflow_(high|low)_${vol}_*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my @files = grep { /BlockedWflow_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
