@@ -25,8 +25,8 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/BlockedWflow_";
-  my @files = grep { /BlockedWflow_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my $base_name = "${NF}flav_${vol}/BlockedWflow2_";
+  my @files = grep { /BlockedWflow2_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -135,7 +135,7 @@ foreach my $block (@{$block{$LargeV}}) {
           #$Full_delta_beta{$block}{$largeb}{$loop}{$t}="NaN";
         #}
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-          output => "Plots_${NF}flav/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+          output => "Plots_${NF}flav2/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
           xlabel => "Beta",
           ylabel => "Expectation Value",
@@ -221,7 +221,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     }
 
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-      output => "Plots_${NF}flav/smearing_time/${largeb}_${loop}.png",
+      output => "Plots_${NF}flav2/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
