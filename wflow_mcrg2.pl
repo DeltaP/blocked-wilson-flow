@@ -145,7 +145,7 @@ foreach my $block (@{$block{$LargeV}}) {
         $chart->command("set label 1 \"Delta Beta:  $Full_delta_beta{$block}{$largeb}{$loop}{$t}\"");
         $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
         #if ($hasroot > 0) {
-          #$chart->command("set arrow from $largeb,$lv_value to $beta_diff,$lv_value");
+          $chart->command("set arrow from $largeb,$lv_value to $beta_diff,$lv_value");
         #}
         my $dataSet0 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for small volumes
           xdata => \@x1,
