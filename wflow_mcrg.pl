@@ -171,7 +171,7 @@ foreach my $block (@{$block{$LargeV}}) {
 }
 print"Finding Delta Beta Complete!\n";
 
-my (%T_optimal, %Delta_beta_optimal) = ();
+my (%T_optimal, %Delta_beta_optimal, %T_optimal_avg) = ();
 
 print"Finding Optimal Smearing Time:\n";
 foreach my $largeb (@{$Beta{$LargeV}}) {
@@ -261,6 +261,20 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
 
   my $b_avg = stat_mod::avg(@b_opt);
   my $b_std = stat_mod::stdev(@b_opt);
+  $T_optimal_avg{$largeb} = stat_mod::avg(@t_opt);
   print"AVG $b_avg\tSTDEV $b_std\n";
 }
 print"Finding Optimal Smearing Time Complete!\n";
+
+sub closest { 
+  my $find = shift; 
+  my $closest = shift; 
+  abs($_ - $find) < abs($closest - $find) and $closest = $_ for 
+  @_; $closest; 
+} 
+
+print"Extrapolating Delta Beta from Averaged Optimal Smearing:\n";
+foreach my $largeb (@{$Beta{$LargeV}}) {
+  print"... Beta:  $largeb\n";
+  foreach my $loop (0,1,2,3,4) {
+    foreach my $t (@smearingt) {
