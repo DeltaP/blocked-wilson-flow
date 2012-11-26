@@ -1,6 +1,7 @@
 *.numbers
 *.txt
 *.swp
+*.out
 summary/summary.aux
 
 4flav_1224
@@ -20,3 +21,5 @@ Plots_12flav
 Plots_oldaction12flav
 Plots_12flav2
 Plots_12flav3
+Plots_12flav4
+Plots_12flav5
