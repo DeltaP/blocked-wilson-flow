@@ -20,6 +20,10 @@ my %Mass = (
   "$LargeV" => "$LargeM",
 );
 
+sub zup { 
+    join "\n" => map {join " " => map {shift @$_} @_} @{$_ [0]} 
+} 
+
 my (%val, %avg, %err, %Beta, %block, %Full_delta_beta) = ();
 my @smearingt = ();
 
@@ -171,7 +175,7 @@ foreach my $block (@{$block{$LargeV}}) {
 }
 print"Finding Delta Beta Complete!\n";
 
-my (%T_optimal, %Delta_beta_optimal) = ();
+my (%T_optimal, %Delta_beta_optimal, %T_optimal_avg) = ();
 
 print"Finding Optimal Smearing Time:\n";
 foreach my $largeb (@{$Beta{$LargeV}}) {
@@ -261,6 +265,88 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
 
   my $b_avg = stat_mod::avg(@b_opt);
   my $b_std = stat_mod::stdev(@b_opt);
-  print"AVG $b_avg\tSTDEV $b_std\n";
+  $T_optimal_avg{$largeb} = stat_mod::avg(@t_opt);
+  my $t_std = stat_mod::stdev(@t_opt);
+  print"Topt:  AVG $T_optimal_avg{$largeb}\tSTDEV $t_std\n";
+  print"Beta:  AVG $b_avg\tSTDEV $b_std\n";
 }
 print"Finding Optimal Smearing Time Complete!\n";
+
+sub closest { 
+  my $find = shift; 
+  my $closest = shift; 
+  abs($_ - $find) < abs($closest - $find) and $closest = $_ for 
+  @_; $closest; 
+} 
+
+my %dbo = ();
+print"Extrapolating Delta Beta from Averaged Optimal Smearing:\n";
+foreach my $largeb (@{$Beta{$LargeV}}) {
+  print"... Beta:  $largeb\n";
+  my (@b_opt) = ();
+  foreach my $loop (0,1,2,3,4) {
+    my @x = @smearingt;
+    my @y = ();
+    my @y2 = ();
+    my @y3 = ();
+    my $count = 0;
+    my $index = 0;
+    my $die = 0;
+    foreach my $t (@smearingt) {
+      my $diff;
+      if (($Full_delta_beta{2}{$largeb}{$loop}{$t} =~ "NaN") || ($Full_delta_beta{3}{$largeb}{$loop}{$t} =~ "NaN")){$diff="NaN";}
+      $diff = $t - $T_optimal_avg{$largeb};
+      if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
+      $count ++;
+      push(@y2,$Full_delta_beta{2}{$largeb}{$loop}{$t});
+      push(@y3,$Full_delta_beta{3}{$largeb}{$loop}{$t});
+    }
+
+    my @xf=@smearingt[($index-1)..$index];
+    my @yf2=@y3[($index-1)..$index];
+    my $x2=pdl(@xf);                                                              # puts data into a piddle for fitting
+    my $y2=pdl(@yf2);
+    (my $fit2,my $coeffs2)=fitpoly1d $x2, $y2, 2;
+    my $b2=$coeffs2->at(0);      
+    my $a2=$coeffs2->at(1);
+    
+    $dbo{$loop}{$largeb}=$a2*$T_optimal_avg{$largeb}+$b2;
+    print"$loop\t$T_optimal_avg{$largeb}\t$dbo{$loop}{$largeb}\n";
+    push(@b_opt, $a2*$T_optimal_avg{$largeb}+$b2);
+
+    my $chart = Chart::Gnuplot->new(                                              # Create chart object 
+      output => "Plots_${NF}flav2/same_smearing_time/${largeb}_${loop}.png",
+      title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
+      xlabel => "Smearing Time",
+      ylabel => "Delta Beta",
+      #yrange => [0,1]
+    );
+    $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
+    $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
+    $chart->command("set label 1 \"Optimal Smearing Time:  $T_optimal_avg{$largeb}\"");
+    $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
+    $chart->command("set label 2 \"Optimal Delta Beta:     $dbo{$loop}{$largeb}\"");
+    $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
+    $chart->command("set label 3 \"\" at $T_optimal_avg{$largeb},$dbo{$loop}{$largeb} point pointtype 2");
+    my $dataSet1 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for large volume
+      xdata => \@x,
+      ydata => \@y2,
+      title => "Large volume blocked twice: ${loop}",
+    );
+    my $dataSet2 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      xdata => \@x,
+      ydata => \@y3,
+      title => "Large volume blocked thrice: ${loop}",
+    );
+    my $dataSet3 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a2*x+$b2",
+      title => "Fit: Blocked Thrice",
+    );
+    $chart->plot2d($dataSet1, $dataSet2, $dataSet3);
+  }
+
+  my $b_avg = stat_mod::avg(@b_opt);
+  my $b_std = stat_mod::stdev(@b_opt);
+  print"Beta:  AVG $b_avg\tSTDEV $b_std\n";
+}
+print"Extrapolating Delta Beta from Averaged Optimal Smearing Complete!\n";

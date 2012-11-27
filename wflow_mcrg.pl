@@ -20,6 +20,10 @@ my %Mass = (
   "$LargeV" => "$LargeM",
 );
 
+sub zup { 
+    join "\n" => map {join " " => map {shift @$_} @_} @{$_ [0]} 
+} 
+
 my (%val, %avg, %err, %Beta, %block, %Full_delta_beta) = ();
 my @smearingt = ();
 
@@ -263,7 +267,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   my $b_std = stat_mod::stdev(@b_opt);
   $T_optimal_avg{$largeb} = stat_mod::avg(@t_opt);
   my $t_std = stat_mod::stdev(@t_opt);
-  print"Topt:  AVG $T_optimal_avg{$largeb}\tSTDEV $b_std\n";
+  print"Topt:  AVG $T_optimal_avg{$largeb}\tSTDEV $t_std\n";
   print"Beta:  AVG $b_avg\tSTDEV $b_std\n";
 }
 print"Finding Optimal Smearing Time Complete!\n";
@@ -291,7 +295,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     foreach my $t (@smearingt) {
       my $diff;
       if (($Full_delta_beta{2}{$largeb}{$loop}{$t} =~ "NaN") || ($Full_delta_beta{3}{$largeb}{$loop}{$t} =~ "NaN")){$diff="NaN";}
-      $diff = $Full_delta_beta{2}{$largeb}{$loop}{$t} - $Full_delta_beta{3}{$largeb}{$loop}{$t};
+      $diff = $t - $T_optimal_avg{$largeb};
       if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
       $count ++;
       push(@y2,$Full_delta_beta{2}{$largeb}{$loop}{$t});
