@@ -261,6 +261,10 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked Thrice",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
+    open FILE, ">", "Plots_${NF}flav/out/${largeb}_${loop}" or die $!;
+    print FILE zup \(@x, @y1, @y2); 
+    print FILE "\n"; 
+    close FILE;
   }
 
   my $b_avg = stat_mod::avg(@b_opt);
