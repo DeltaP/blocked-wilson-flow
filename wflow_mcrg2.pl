@@ -97,8 +97,8 @@ foreach my $block (@{$block{$LargeV}}) {
           push(@e1, $err{$SmallV}{$smallb}{$t}{$loop}{$block-1});
         }
         foreach my $lv_beta (@{$Beta{$LargeV}}) {
-          push(@y2, $avg{$LargeV}{$largeb}{$t}{$loop}{$block});
-          push(@e2, $err{$LargeV}{$largeb}{$t}{$loop}{$block});
+          push(@y2, $avg{$LargeV}{$lv_beta}{$t}{$loop}{$block});
+          push(@e2, $err{$LargeV}{$lv_beta}{$t}{$loop}{$block});
         }
         my (@x,@y,@e) =();                                                        # declares fitting arrays
         if ($index < 2) {
@@ -263,7 +263,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
     open FILE, ">", "Plots_${NF}flav2/out/${largeb}_${loop}" or die $!;
-    print FILE zup \(@x, @y1, @y2); 
+    print FILE zup \(@x, @y2, @y3); 
     print FILE "\n"; 
     close FILE;
   }
