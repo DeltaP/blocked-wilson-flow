@@ -20,13 +20,18 @@ my %Mass = (
   "$LargeV" => "$LargeM",
 );
 
+sub zup {
+  join "\n", map { my $i = $_; join ' ', map $_->[ $i ], @_ } 0 .. $#{
++ $_[0] }
+}
+
 my (%val, %avg, %err, %Beta, %block, %Full_delta_beta) = ();
 my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/BlockedWflow4_";
-  my @files = grep { /BlockedWflow4_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my $base_name = "${NF}flav_${vol}/BlockedWflow5_";
+  my @files = grep { /BlockedWflow5_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -40,7 +45,7 @@ foreach my $vol ($SmallV, $LargeV) {
     my @lines = grep{$_=~/^LOOPS/} @in;                                           # greps for lines with the header LOOPS
     foreach my $l (@lines) {                                                      # loops through matched lines
       my @split = split(/\s+/, $l);                                               # splits matched lines
-      if (($split[1] < 0.01) || ($split[1] > 0.4)) {next;}                                                # some of the files have legacy mistake t's that are too large
+      if (($split[1] < 0.01) || ($split[1] > 0.15)) {next;}                                                # some of the files have legacy mistake t's that are too large
       push(@{$val{$vol}{$beta}{$split[1]}{$split[2]}{$split[4]}}, $split[6]);     # reads data into hash
       if (!grep{$_ eq $split[1]} @smearingt) {                                    # fills the smearing time array
         push(@smearingt, $split[1]);
@@ -92,8 +97,8 @@ foreach my $block (@{$block{$LargeV}}) {
           push(@e1, $err{$SmallV}{$smallb}{$t}{$loop}{$block-1});
         }
         foreach my $lv_beta (@{$Beta{$LargeV}}) {
-          push(@y2, $avg{$LargeV}{$largeb}{$t}{$loop}{$block});
-          push(@e2, $err{$LargeV}{$largeb}{$t}{$loop}{$block});
+          push(@y2, $avg{$LargeV}{$lv_beta}{$t}{$loop}{$block});
+          push(@e2, $err{$LargeV}{$lv_beta}{$t}{$loop}{$block});
         }
         my (@x,@y,@e) =();                                                        # declares fitting arrays
         if ($index < 2) {
@@ -171,7 +176,7 @@ foreach my $block (@{$block{$LargeV}}) {
 }
 print"Finding Delta Beta Complete!\n";
 
-my (%T_optimal, %Delta_beta_optimal) = ();
+my (%T_optimal, %Delta_beta_optimal, %T_optimal_avg) = ();
 
 print"Finding Optimal Smearing Time:\n";
 foreach my $largeb (@{$Beta{$LargeV}}) {
@@ -257,10 +262,239 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked Thrice",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
+    open FILE, ">", "Plots_${NF}flav5/out/${largeb}_${loop}" or die $!;
+    print FILE zup \(@x, @y2, @y3); 
+    print FILE "\n"; 
+    close FILE;
   }
 
   my $b_avg = stat_mod::avg(@b_opt);
   my $b_std = stat_mod::stdev(@b_opt);
-  print"AVG $b_avg\tSTDEV $b_std\n";
+  $T_optimal_avg{$largeb} = stat_mod::avg(@t_opt);
+  my $t_std = stat_mod::stdev(@t_opt);
+  print"Topt:  AVG $T_optimal_avg{$largeb}\tSTDEV $t_std\n";
+  print"Beta:  AVG $b_avg\tSTDEV $b_std\n";
 }
 print"Finding Optimal Smearing Time Complete!\n";
+
+my %dbo = ();
+print"Extrapolating Delta Beta from Averaged Optimal Smearing:\n";
+foreach my $largeb (@{$Beta{$LargeV}}) {
+  print"... Beta:  $largeb\n";
+  my (@b_opt) = ();
+  foreach my $loop (0,1,2,3,4) {
+    my @x = @smearingt;
+    my @y = ();
+    my @y2 = ();
+    my @y3 = ();
+    my $count = 0;
+    my $index = 0;
+    my $die = 0;
+    foreach my $t (@smearingt) {
+      my $diff;
+      if (($Full_delta_beta{2}{$largeb}{$loop}{$t} =~ "NaN") || ($Full_delta_beta{3}{$largeb}{$loop}{$t} =~ "NaN")){$diff="NaN";}
+      $diff = $t - $T_optimal_avg{$largeb};
+      if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
+      $count ++;
+      push(@y2,$Full_delta_beta{2}{$largeb}{$loop}{$t});
+      push(@y3,$Full_delta_beta{3}{$largeb}{$loop}{$t});
+    }
+
+    my @xf=@smearingt[($index-1)..$index];
+    my @yf2=@y3[($index-1)..$index];
+    my $x2=pdl(@xf);                                                              # puts data into a piddle for fitting
+    my $y2=pdl(@yf2);
+    (my $fit2,my $coeffs2)=fitpoly1d $x2, $y2, 2;
+    my $b2=$coeffs2->at(0);      
+    my $a2=$coeffs2->at(1);
+    
+    $dbo{$loop}{$largeb}=$a2*$T_optimal_avg{$largeb}+$b2;
+    print"$loop\t$T_optimal_avg{$largeb}\t$dbo{$loop}{$largeb}\n";
+    push(@b_opt, $a2*$T_optimal_avg{$largeb}+$b2);
+
+    my $chart = Chart::Gnuplot->new(                                              # Create chart object 
+      output => "Plots_${NF}flav5/same_smearing_time/${largeb}_${loop}.png",
+      title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
+      xlabel => "Smearing Time",
+      ylabel => "Delta Beta",
+      #yrange => [0,1]
+    );
+    $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
+    $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
+    $chart->command("set label 1 \"Optimal Smearing Time:  $T_optimal_avg{$largeb}\"");
+    $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
+    $chart->command("set label 2 \"Optimal Delta Beta:     $dbo{$loop}{$largeb}\"");
+    $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
+    $chart->command("set label 3 \"\" at $T_optimal_avg{$largeb},$dbo{$loop}{$largeb} point pointtype 2");
+    my $dataSet1 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for large volume
+      xdata => \@x,
+      ydata => \@y2,
+      title => "Large volume blocked twice: ${loop}",
+    );
+    my $dataSet2 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      xdata => \@x,
+      ydata => \@y3,
+      title => "Large volume blocked thrice: ${loop}",
+    );
+    my $dataSet3 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a2*x+$b2",
+      title => "Fit: Blocked Thrice",
+    );
+    $chart->plot2d($dataSet1, $dataSet2, $dataSet3);
+  }
+
+  my $b_avg = stat_mod::avg(@b_opt);
+  my $b_std = stat_mod::stdev(@b_opt);
+  print"Beta:  AVG $b_avg\tSTDEV $b_std\n";
+}
+print"Extrapolating Delta Beta from Averaged Optimal Smearing Complete!\n";
+
+
+#averages over different loops
+print"Extrapolating Delta Beta Averaging over Loops First:\n";
+my (%Avg_t_optimal,%Avg_delta_beta_optimal) = ();
+my (%Avg_t_optimal_1,%Avg_delta_beta_optimal_1) = ();
+my (%Avg_t_optimal_2,%Avg_delta_beta_optimal_2) = ();
+my (%Avg_t_optimal_3,%Avg_delta_beta_optimal_3) = ();
+my (%Avg_t_optimal_4,%Avg_delta_beta_optimal_4) = ();
+foreach my $largeb (@{$Beta{$LargeV}}) {
+  print"... Beta:  $largeb\n";
+  my (@db2_avg, @db2_err, @db3_avg, @db3_err) = ();
+  foreach my $t (@smearingt) {
+    my (@db2, @db3) = ();
+    foreach my $loop (0,1,2,3,4) {
+      push(@db2, $Full_delta_beta{2}{$largeb}{$loop}{$t});
+      push(@db3, $Full_delta_beta{3}{$largeb}{$loop}{$t});
+    }
+    push(@db2_avg,stat_mod::avg(@db2));
+    push(@db2_err,stat_mod::stdev(@db2));
+    push(@db3_avg,stat_mod::avg(@db3));
+    push(@db3_err,stat_mod::stdev(@db3));
+  }
+  my $count = 0;
+  my $index = 0;
+  my $die = 0;
+  foreach my $t (@smearingt) {
+    my $diff;
+    $diff = $db2_avg[$count] - $db3_avg[$count];
+    if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
+    $count ++;
+  }
+
+  my $x=pdl(@smearingt[$index-1..$index+1]);                                                              # puts data into a piddle for fitting
+  my $y2=pdl(@db2_avg[$index-1..$index+1]);
+  my $y2_err=pdl(@db2_err[$index-1..$index+1]);
+  my $y3=pdl(@db3_avg[$index-1..$index+1]);
+  my $y3_err=pdl(@db3_err[$index-1..$index+1]);
+  my $y2_plus=$y2+$y2_err;
+  my $y2_minus=$y2-$y2_err;
+  my $y3_plus=$y3+$y3_err;
+  my $y3_minus=$y3-$y3_err;
+
+  (my $fit2,my $coeffs2)=fitpoly1d $x, $y2, 2;
+  my $b2=$coeffs2->at(0);      
+  my $a2=$coeffs2->at(1);
+  (my $fit2_plus,my $coeffs2_plus)=fitpoly1d $x, $y2_plus, 2;
+  my $b2_plus=$coeffs2_plus->at(0);      
+  my $a2_plus=$coeffs2_plus->at(1);
+  (my $fit2_minus,my $coeffs2_minus)=fitpoly1d $x, $y2_minus, 2;
+  my $b2_minus=$coeffs2_minus->at(0);      
+  my $a2_minus=$coeffs2_minus->at(1);
+  (my $fit3,my $coeffs3)=fitpoly1d $x, $y3, 2;
+  my $b3=$coeffs3->at(0);      
+  my $a3=$coeffs3->at(1);
+  (my $fit3_plus,my $coeffs3_plus)=fitpoly1d $x, $y3_plus, 2;
+  my $b3_plus=$coeffs3_plus->at(0);      
+  my $a3_plus=$coeffs3_plus->at(1);
+  (my $fit3_minus,my $coeffs3_minus)=fitpoly1d $x, $y3_minus, 2;
+  my $b3_minus=$coeffs3_minus->at(0);      
+  my $a3_minus=$coeffs3_minus->at(1);
+
+  my @roots=poly_roots($a2-$a3,$b2-$b3);                #finds intersection i.e. alpha optimal
+  foreach my $r (@roots){
+    $Avg_t_optimal{$largeb}=$r;
+    $Avg_delta_beta_optimal{$largeb}=$a2*$r+$b2;
+    print"$largeb\t$r\t$Avg_delta_beta_optimal{$largeb}\n";
+  }
+
+  @roots=poly_roots($a2_plus-$a3_plus,$b2_plus-$b3_plus);                #finds intersection i.e. alpha optimal
+  foreach my $r (@roots){
+    $Avg_t_optimal_1{$largeb}=$r;
+    $Avg_delta_beta_optimal_1{$largeb}=$a2_plus*$r+$b2_plus;
+    print"$largeb\t$r\t$Avg_delta_beta_optimal_1{$largeb}\n";
+  }
+  @roots=poly_roots($a2_minus-$a3_minus,$b2_minus-$b3_minus);                #finds intersection i.e. alpha optimal
+  foreach my $r (@roots){
+    $Avg_t_optimal_2{$largeb}=$r;
+    $Avg_delta_beta_optimal_2{$largeb}=$a2_minus*$r+$b2_minus;
+    print"$largeb\t$r\t$Avg_delta_beta_optimal_2{$largeb}\n";
+  }
+  @roots=poly_roots($a2_minus-$a3_plus,$b2_minus-$b3_plus);                #finds intersection i.e. alpha optimal
+  foreach my $r (@roots){
+    $Avg_t_optimal_3{$largeb}=$r;
+    $Avg_delta_beta_optimal_3{$largeb}=$a2_minus*$r+$b2_minus;
+    print"$largeb\t$r\t$Avg_delta_beta_optimal_3{$largeb}\n";
+  }
+  @roots=poly_roots($a2_plus-$a3_minus,$b2_plus-$b3_minus);                #finds intersection i.e. alpha optimal
+  foreach my $r (@roots){
+    $Avg_t_optimal_4{$largeb}=$r;
+    $Avg_delta_beta_optimal_4{$largeb}=$a2_plus*$r+$b2_plus;
+    print"$largeb\t$r\t$Avg_delta_beta_optimal_4{$largeb}\n";
+  }
+
+  my $chart = Chart::Gnuplot->new(                                              # Create chart object 
+    output => "Plots_${NF}flav5/avg_smearing_time/avg_${largeb}.png",
+    title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
+    xlabel => "Smearing",
+    ylabel => "Delta Beta",
+    #yrange => [0,1]
+  );
+    $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
+    $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
+    $chart->command("set label 1 \"Optimal Smearing Time:  $Avg_t_optimal{$largeb}\"");
+    $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
+    $chart->command("set label 2 \"Optimal Delta Beta:  $Avg_delta_beta_optimal{$largeb}\"");
+    $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
+    my $dataSet1 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for large volume
+      xdata => \@smearingt,
+      ydata => [\@db2_avg,\@db2_err],
+      title => "Large volume blocked twice",
+      style => "yerrorbars",
+    );
+    my $dataSet2 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for large volume
+      xdata => \@smearingt,
+      ydata => [\@db3_avg,\@db3_err],
+      title => "Large volume blocked thrice",
+      style => "yerrorbars",
+    );
+    my $dataSet3 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a2_plus*x+$b2_plus",
+      title => "Fit: Blocked 2+error",
+    );
+    my $dataSet4 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a2_minus*x+$b2_minus",
+      title => "Fit: Blocked 2-error",
+    );
+    my $dataSet5 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a2*x+$b2",
+      title => "Fit: Blocked 2",
+    );
+    my $dataSet6 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a3_plus*x+$b3_plus",
+      title => "Fit: Blocked 3+error",
+    );
+    my $dataSet7 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a3_minus*x+$b3_minus",
+      title => "Fit: Blocked 3-error",
+    );
+    my $dataSet8 = Chart::Gnuplot::DataSet->new(                                  # Create dataset object for the fit
+      func => "$a3*x+$b3",
+      title => "Fit: Blocked 3",
+    );
+    $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5, $dataSet6, $dataSet7, $dataSet8);
+    open FILE, ">", "Plots_${NF}flav5/out/avg_${largeb}" or die $!;
+    print FILE zup \(@smearingt, @db2_avg, @db2_err, @db3_avg, @db3_err); 
+    print FILE "\n"; 
+    close FILE;
+}
+print"Extrapolating Delta Beta Averaging over Loops First Complete!\n";

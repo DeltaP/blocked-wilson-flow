@@ -30,8 +30,8 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/BlockedWflow3_";
-  my @files = grep { /BlockedWflow3_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my $base_name = "${NF}flav_${vol}/BlockedWflow6_";
+  my @files = grep { /BlockedWflow6_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -140,7 +140,7 @@ foreach my $block (@{$block{$LargeV}}) {
           #$Full_delta_beta{$block}{$largeb}{$loop}{$t}="NaN";
         #}
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-          output => "Plots_${NF}flav3/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+          output => "Plots_${NF}flav6/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
           xlabel => "Beta",
           ylabel => "Expectation Value",
@@ -226,7 +226,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     }
 
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-      output => "Plots_${NF}flav3/smearing_time/${largeb}_${loop}.png",
+      output => "Plots_${NF}flav6/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
@@ -262,7 +262,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked Thrice",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
-    open FILE, ">", "Plots_${NF}flav3/out/${largeb}_${loop}" or die $!;
+    open FILE, ">", "Plots_${NF}flav6/out/${largeb}_${loop}" or die $!;
     print FILE zup \(@x, @y2, @y3); 
     print FILE "\n"; 
     close FILE;
@@ -313,7 +313,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     push(@b_opt, $a2*$T_optimal_avg{$largeb}+$b2);
 
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-      output => "Plots_${NF}flav3/same_smearing_time/${largeb}_${loop}.png",
+      output => "Plots_${NF}flav6/same_smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
@@ -443,7 +443,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   }
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-    output => "Plots_${NF}flav3/avg_smearing_time/avg_${largeb}.png",
+    output => "Plots_${NF}flav6/avg_smearing_time/avg_${largeb}.png",
     title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
     xlabel => "Smearing",
     ylabel => "Delta Beta",
@@ -492,7 +492,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked 3",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5, $dataSet6, $dataSet7, $dataSet8);
-    open FILE, ">", "Plots_${NF}flav3/out/avg_${largeb}" or die $!;
+    open FILE, ">", "Plots_${NF}flav6/out/avg_${largeb}" or die $!;
     print FILE zup \(@smearingt, @db2_avg, @db2_err, @db3_avg, @db3_err); 
     print FILE "\n"; 
     close FILE;
