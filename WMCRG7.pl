@@ -1,3 +1,4 @@
+
 #!/usr/bin/perl
 use strict;
 use warnings;
@@ -30,8 +31,8 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/BlockedWflow5_";
-  my @files = grep { /BlockedWflow5_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my $base_name = "${NF}flav_${vol}/WMCRG7_";
+  my @files = grep { /WMCRG7_(high|low)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -76,12 +77,40 @@ foreach my $block (@{$block{$LargeV}}) {
     foreach my $loop (0,1,2,3,4) {
       foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
         my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                 # large volume value at large volume beta
+        my $large_index = 0;
+        ++$large_index until $Beta{$LargeV}[$large_index] == $largeb;
         my @x1 = @{$Beta{$SmallV}};                                               # arrays for plots
         my @y1 = ();
         my @e1 = ();
         my @x2 = @{$Beta{$LargeV}};
         my @y2 = ();
         my @e2 = ();
+
+        foreach my $lv_beta (@{$Beta{$LargeV}}) {
+          push(@y2, $avg{$LargeV}{$lv_beta}{$t}{$loop}{$block});
+          push(@e2, $err{$LargeV}{$lv_beta}{$t}{$loop}{$block});
+        }
+        my @xl = ();
+        my @yl = ();
+        if ($large_index < 1) {
+          @xl = @x2[0..2];
+          @yl = @y2[0..2];
+        }
+        elsif ($large_index > (@{$Beta{$LargeV}}-2)) {
+          @xl = @x2[(@{$Beta{$LargeV}}-3)..(@{$Beta{$LargeV}}-1)];
+          @yl = @y2[(@y2-3)..(@y2-1)];
+        }
+        else{
+          @xl = @x2[($large_index-1)..($large_index+1)];
+          @yl = @y2[($large_index-1)..($large_index+1)];
+        }
+        my $x=pdl(@xl);                                                            # puts small volume data into piddle for fitting
+        my $y=pdl(@yl);
+        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 2;                                # fits the small volumes
+        my $a1=$coeffs->at(1);                                                     # extracts out the coefficients
+        my $b1=$coeffs->at(0);
+        $lv_value=$fit->at(2);
+
         my $index=0;
         my $count=0;
         my $n_diff;
@@ -95,10 +124,6 @@ foreach my $block (@{$block{$LargeV}}) {
           $count++;
           push(@y1, $avg{$SmallV}{$smallb}{$t}{$loop}{$block-1});
           push(@e1, $err{$SmallV}{$smallb}{$t}{$loop}{$block-1});
-        }
-        foreach my $lv_beta (@{$Beta{$LargeV}}) {
-          push(@y2, $avg{$LargeV}{$lv_beta}{$t}{$loop}{$block});
-          push(@e2, $err{$LargeV}{$lv_beta}{$t}{$loop}{$block});
         }
         my (@x,@y,@e) =();                                                        # declares fitting arrays
         if ($index < 2) {
@@ -116,17 +141,17 @@ foreach my $block (@{$block{$LargeV}}) {
           @y = @y1[($index-1)..($index+2)];
           @e = @e1[($index-1)..($index+2)];
         }
-        my $x=pdl(@x);                                                            # puts small volume data into piddle for fitting
-        my $y=pdl(@y);
+        $x=pdl(@x);                                                            # puts small volume data into piddle for fitting
+        $y=pdl(@y);
         my $e=pdl(@e);
-        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 2;                                # fits the small volumes
-        my $a=$coeffs->at(1);                                                     # extracts out the coefficients
-        my $b=$coeffs->at(0);
+        ($fit ,$coeffs)=fitpoly1d $x, $y, 2;                                # fits the small volumes
+        my $a2=$coeffs->at(1);                                                     # extracts out the coefficients
+        my $b2=$coeffs->at(0);
         #my $a=$coeffs->at(3);                                                     # extracts out the coefficients
         #my $b=$coeffs->at(2);
         #my $c=$coeffs->at(1);
         #my $d=$coeffs->at(0);
-        my @roots=poly_roots($a,($b-$lv_value));                                  # solves for the difference between the fit and the large mass value
+        my @roots=poly_roots($a2,($b2-$lv_value));                                  # solves for the difference between the fit and the large mass value
         my $beta_diff;
         #my $hasroot = 0;
         foreach my $r (@roots){
@@ -140,7 +165,7 @@ foreach my $block (@{$block{$LargeV}}) {
           #$Full_delta_beta{$block}{$largeb}{$loop}{$t}="NaN";
         #}
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-          output => "Plots_${NF}flav5/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+          output => "Plots_${NF}_WMCRG7/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
           xlabel => "Beta",
           ylabel => "Expectation Value",
@@ -166,10 +191,15 @@ foreach my $block (@{$block{$LargeV}}) {
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
           #func => "$a*x**3+$b*x**2+$c*x+$d",
-          func => "$a*x+$b",
+          func => "$a1*x+$b1",
+          title => "Fit to Large Volume",
+        );
+        my $dataSet3 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
+          #func => "$a*x**3+$b*x**2+$c*x+$d",
+          func => "$a2*x+$b2",
           title => "Fit to Small Volume",
         );
-        $chart->plot2d($dataSet0, $dataSet1, $dataSet2);                          # plots the chart
+        $chart->plot2d($dataSet0, $dataSet1, $dataSet2, $dataSet3);                          # plots the chart
       }
     }
   }
@@ -226,7 +256,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     }
 
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-      output => "Plots_${NF}flav5/smearing_time/${largeb}_${loop}.png",
+      output => "Plots_${NF}_WMCRG7/smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
@@ -262,7 +292,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked Thrice",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5);
-    open FILE, ">", "Plots_${NF}flav5/out/${largeb}_${loop}" or die $!;
+    open FILE, ">", "Plots_${NF}_WMCRG7/out/${largeb}_${loop}" or die $!;
     print FILE zup \(@x, @y2, @y3); 
     print FILE "\n"; 
     close FILE;
@@ -313,7 +343,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     push(@b_opt, $a2*$T_optimal_avg{$largeb}+$b2);
 
     my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-      output => "Plots_${NF}flav5/same_smearing_time/${largeb}_${loop}.png",
+      output => "Plots_${NF}_WMCRG7/same_smearing_time/${largeb}_${loop}.png",
       title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
       xlabel => "Smearing Time",
       ylabel => "Delta Beta",
@@ -443,7 +473,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   }
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-    output => "Plots_${NF}flav5/avg_smearing_time/avg_${largeb}.png",
+    output => "Plots_${NF}_WMCRG7/avg_smearing_time/avg_${largeb}.png",
     title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
     xlabel => "Smearing",
     ylabel => "Delta Beta",
@@ -492,7 +522,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked 3",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5, $dataSet6, $dataSet7, $dataSet8);
-    open FILE, ">", "Plots_${NF}flav5/out/avg_${largeb}" or die $!;
+    open FILE, ">", "Plots_${NF}_WMCRG7/out/avg_${largeb}" or die $!;
     print FILE zup \(@smearingt, @db2_avg, @db2_err, @db3_avg, @db3_err); 
     print FILE "\n"; 
     close FILE;

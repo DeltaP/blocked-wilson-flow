@@ -46,7 +46,7 @@ foreach my $vol ($SmallV, $LargeV) {
     my @lines = grep{$_=~/^LOOPS/} @in;                                           # greps for lines with the header LOOPS
     foreach my $l (@lines) {                                                      # loops through matched lines
       my @split = split(/\s+/, $l);                                               # splits matched lines
-      if (($split[1] < 0.01) || ($split[1] > 0.15)) {next;}                                                # some of the files have legacy mistake t's that are too large
+      #if (($split[1] < 0.01) || ($split[1] > 0.15)) {next;}                                                # some of the files have legacy mistake t's that are too large
       push(@{$val{$vol}{$beta}{$split[1]}{$split[2]}{$split[4]}}, $split[6]);     # reads data into hash
       if (!grep{$_ eq $split[1]} @smearingt) {                                    # fills the smearing time array
         push(@smearingt, $split[1]);
