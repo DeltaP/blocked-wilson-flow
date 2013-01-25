@@ -76,6 +76,8 @@ foreach my $block (@{$block{$LargeV}}) {
     foreach my $loop (0,1,2,3,4) {
       foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
         my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                 # large volume value at large volume beta
+        my $large_index = 0;
+        ++$large_index until $Beta{$LargeV}[$large_index] == $largeb;
         my @x1 = @{$Beta{$SmallV}};                                               # arrays for plots
         my @y1 = ();
         my @e1 = ();

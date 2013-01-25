@@ -2,6 +2,10 @@
 *.txt
 *.swp
 *.out
+*.log
+*.aux
+*.pdf
+
 summary/summary.aux
 
 4flav_1224
@@ -24,3 +28,7 @@ Plots_12flav2
 Plots_12flav3
 Plots_12flav4
 Plots_12flav5
+Plots_12flav6
+Plots_12flav7
+Plots_12_WMCRG2
+Plots_12_WMCRG7
