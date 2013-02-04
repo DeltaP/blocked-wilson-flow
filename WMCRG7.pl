@@ -92,24 +92,29 @@ foreach my $block (@{$block{$LargeV}}) {
         }
         my @xl = ();
         my @yl = ();
-        if ($large_index < 1) {
-          @xl = @x2[0..2];
-          @yl = @y2[0..2];
+        if ($large_index < 2) {
+          @xl = @x2[0..4];
+          @yl = @y2[0..4];
         }
-        elsif ($large_index > (@{$Beta{$LargeV}}-2)) {
-          @xl = @x2[(@{$Beta{$LargeV}}-3)..(@{$Beta{$LargeV}}-1)];
-          @yl = @y2[(@y2-3)..(@y2-1)];
+        elsif ($large_index > (@{$Beta{$LargeV}}-3)) {
+          @xl = @x2[(@{$Beta{$LargeV}}-5)..(@{$Beta{$LargeV}}-1)];
+          @yl = @y2[(@y2-5)..(@y2-1)];
         }
         else{
-          @xl = @x2[($large_index-1)..($large_index+1)];
-          @yl = @y2[($large_index-1)..($large_index+1)];
+          @xl = @x2[($large_index-2)..($large_index+2)];
+          @yl = @y2[($large_index-2)..($large_index+2)];
         }
         my $x=pdl(@xl);                                                            # puts small volume data into piddle for fitting
         my $y=pdl(@yl);
-        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 2;                                # fits the small volumes
-        my $a1=$coeffs->at(1);                                                     # extracts out the coefficients
-        my $b1=$coeffs->at(0);
-        $lv_value=$fit->at(2);
+        (my $fit ,my $coeffs)=fitpoly1d $x, $y, 3;                                # fits the small volumes
+        my $a1=$coeffs->at(2);                                                     # extracts out the coefficients
+        my $b1=$coeffs->at(1);
+        my $c1=$coeffs->at(0);
+        if ($large_index == 0) {$lv_value=$fit->at(0);}
+        elsif ($large_index == 1) {$lv_value=$fit->at(1);}
+        elsif ($large_index == (@{$Beta{$LargeV}}-1)) {$lv_value=$fit->at(4);}
+        elsif ($large_index == (@{$Beta{$LargeV}}-2)) {$lv_value=$fit->at(3);}
+        else {$lv_value=$fit->at(2);}
 
         my $index=0;
         my $count=0;
@@ -191,7 +196,7 @@ foreach my $block (@{$block{$LargeV}}) {
         );
         my $dataSet2 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
           #func => "$a*x**3+$b*x**2+$c*x+$d",
-          func => "$a1*x+$b1",
+          func => "$a1*x**2+$b1*x+$c1",
           title => "Fit to Large Volume",
         );
         my $dataSet3 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
@@ -471,6 +476,11 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     $Avg_delta_beta_optimal_4{$largeb}=$a2_plus*$r+$b2_plus;
     print"$largeb\t$r\t$Avg_delta_beta_optimal_4{$largeb}\n";
   }
+  print"useful line below\n";
+  my $high_err=($Avg_delta_beta_optimal_1{$largeb}+$Avg_delta_beta_optimal_3{$largeb})/2;
+  my $low_err=($Avg_delta_beta_optimal_2{$largeb}+$Avg_delta_beta_optimal_4{$largeb})/2;
+  print"$largeb $Avg_t_optimal_1{$largeb} $Avg_delta_beta_optimal{$largeb} $low_err $high_err\n";
+
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
     output => "Plots_${NF}_WMCRG7/avg_smearing_time/avg_${largeb}.png",
