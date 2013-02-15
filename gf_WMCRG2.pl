@@ -99,14 +99,25 @@ foreach my $block (@{$block{$LargeV}}) {
         my $b1=$coeffs1->at(2);
         my $c1=$coeffs1->at(1);
         my $d1=$coeffs1->at(0);
+        my $temp1=pdl(@e1);
+        my $tt = $fit1-$y1;
+        $temp1=(($fit1-$y1)**2/$e1**2);
+        my $chi1=sum $temp1;
+        $chi1/=(@x1-4-1);
+        #print"CHI^2 small volume:  $chi1\n";
+
         my $x2=pdl(@x2);                                                            # puts small volume data into piddle for fitting
         my $y2=pdl(@y2);
-        my $e2=pdl(@e1);
+        my $e2=pdl(@e2);
         (my $fit2 , my $coeffs2)=fitpoly1d $x2, $y2, 4;                                # fits the small volumes
         my $a2=$coeffs2->at(3);                                                     # extracts out the coefficients
         my $b2=$coeffs2->at(2);
         my $c2=$coeffs2->at(1);
         my $d2=$coeffs2->at(0);
+        my $temp2=pdl(($fit2-$y2)**2/$e2**2);
+        my $chi2=sum $temp2;
+        $chi2/=(@x1-4-1);
+        #print"CHI^2 large volume:  $chi2\n";
 
         my $lv_fit_value = $a2*$largeb**3+$b2*$largeb**2+$c2*$largeb+$d2;
         my @roots=poly_roots(($a1),($b1),($c1),($d1-$lv_fit_value));                                  # solves for the difference between the fit and the large mass value
@@ -121,7 +132,7 @@ foreach my $block (@{$block{$LargeV}}) {
         }
         if ($hasroot != 1) {
           $Full_delta_beta{$block}{$largeb}{$loop}{$t}="NaN";
-          print"$hasroot number of roots found:  $t\t$loop\t$largeb\n";
+          #print"$hasroot number of roots found:  $t\t$loop\t$largeb\n";
           next;
         }
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
@@ -134,6 +145,10 @@ foreach my $block (@{$block{$LargeV}}) {
         $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
         $chart->command("set label 1 \"Delta Beta:  $Full_delta_beta{$block}{$largeb}{$loop}{$t}\"");
         $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
+        $chart->command("set label 2 \"Small V chi^2/dof:  $chi1\"");
+        $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
+        $chart->command("set label 3 \"Large V chi^2/dof:  $chi2\"");
+        $chart->command("set label 3 at graph 0.02, 0.65 tc lt 3");
         #if ($hasroot > 0) {
           $chart->command("set arrow from $largeb,$lv_value to $beta_diff,$lv_value");
         #}
@@ -276,7 +291,6 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
     xlabel => "Smearing",
     ylabel => "Delta Beta",
-    #yrange => [0,1]
   );
     $chart->command("set obj 1 rectangle behind from screen 0,0 to screen 1,1");
     $chart->command("set obj 1 fillstyle solid 1.0 fillcolor rgbcolor \"white\"");
