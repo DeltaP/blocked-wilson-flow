@@ -59,7 +59,7 @@ foreach my $vol ($SmallV, $MediumV, $LargeV) {
   }
   my @sorted_beta = sort { $a <=> $b } @{$Beta{$vol}};
   $Beta{$vol} = [@sorted_beta];
-  print"$vol\t${@Beta{$vol}}\n";
+  print"$vol\t@{$Beta{$vol}}\n";
   foreach my $beta (@{$Beta{$vol}}) {
     foreach my $loop (0,1,2,3,4) {                                                # loops over observables
       foreach my $b (@{$block{$vol}}) {                                           # beta values
@@ -179,7 +179,7 @@ foreach my $t (@smearingt) {
     }
   }
 }
-my $block = 3;                                  
+$block = 3;                                  
 foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
@@ -201,8 +201,6 @@ foreach my $t (@smearingt) {
         push(@e2, $err{$MediumV}{$lv_beta}{$t}{$loop}{$block});
       }
 
-      print"$#x1\t$#y1\n$#x2\t$#y2\n";
-
       my $x1=pdl(@x1);                                                          # puts small volume data into piddle for fitting
       my $y1=pdl(@y1);
       my $e1=pdl(@e1);
@@ -216,7 +214,7 @@ foreach my $t (@smearingt) {
       $temp1=(($fit1-$y1)**2/$e1**2);
       my $chi1=sum $temp1;
       $chi1/=(@x1-4-1);
-      print"CHI^2 small volume:  $chi1\n";
+      #print"CHI^2 small volume:  $chi1\n";
 
       my $x2=pdl(@x2);                                                          # puts small volume data into piddle for fitting
       my $y2=pdl(@y2);
@@ -229,7 +227,7 @@ foreach my $t (@smearingt) {
       my $temp2=pdl(($fit2-$y2)**2/$e2**2);
       my $chi2=sum $temp2;
       $chi2/=(@x1-4-1);
-      print"CHI^2 large volume:  $chi2\n";
+      #print"CHI^2 large volume:  $chi2\n";
 
       my $lv_fit_value = $a2*$largeb**3+$b2*$largeb**2+$c2*$largeb+$d2;
       my @roots=poly_roots(($a1),($b1),($c1),($d1-$lv_fit_value));              # solves for the difference between the fit and the large mass value
