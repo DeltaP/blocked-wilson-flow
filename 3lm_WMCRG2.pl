@@ -59,6 +59,7 @@ foreach my $vol ($SmallV, $MediumV, $LargeV) {
   }
   my @sorted_beta = sort { $a <=> $b } @{$Beta{$vol}};
   $Beta{$vol} = [@sorted_beta];
+  print"$vol\t@Beta{$vol}\n";
   foreach my $beta (@{$Beta{$vol}}) {
     foreach my $loop (0,1,2,3,4) {                                                # loops over observables
       foreach my $b (@{$block{$vol}}) {                                           # beta values
