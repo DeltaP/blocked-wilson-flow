@@ -291,7 +291,7 @@ print"Finding Delta Beta Complete!\n";
 my (%T_optimal, %Delta_beta_optimal, %T_optimal_avg) = ();
 
 #averages over different loops
-print"Extrapolating Delta Beta Averaging over Loops First:\n";
+print"Interpolating Delta Beta Averaging over Loops First:\n";
 my (%Avg_t_optimal,%Avg_delta_beta_optimal) = ();
 my (%Avg_t_optimal_1,%Avg_delta_beta_optimal_1) = ();
 my (%Avg_t_optimal_2,%Avg_delta_beta_optimal_2) = ();
@@ -303,11 +303,11 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   foreach my $t (@smearingt) {
     my (@db2, @db3) = ();
     foreach my $loop (0,1,2,3,4) {
-      if ($Full_delta_beta{2}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db2, $Full_delta_beta{2}{$largeb}{$loop}{$t});
-      }
       if ($Full_delta_beta{3}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db3, $Full_delta_beta{3}{$largeb}{$loop}{$t});
+        push(@db2, $Full_delta_beta{3}{$largeb}{$loop}{$t});
+      }
+      if ($Full_delta_beta{4}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db3, $Full_delta_beta{4}{$largeb}{$loop}{$t});
       }
     }
     if ((@db2 < 2)||(@db3 < 2)) {next;}
