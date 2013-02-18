@@ -200,6 +200,8 @@ foreach my $t (@smearingt) {
         push(@e2, $err{$MediumV}{$lv_beta}{$t}{$loop}{$block});
       }
 
+      print"$#x1\t$#y1\n$#x2\t$#y2\n";
+
       my $x1=pdl(@x1);                                                          # puts small volume data into piddle for fitting
       my $y1=pdl(@y1);
       my $e1=pdl(@e1);
