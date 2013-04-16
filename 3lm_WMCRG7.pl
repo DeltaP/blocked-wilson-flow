@@ -11,12 +11,13 @@ use Math::Polynomial::Solve qw(poly_roots);
 use Chart::Gnuplot;
 
 my $NF     = $ARGV[0];
-my $SmallV = $ARGV[1];                                                            # reads in command line arguments
-my $SmallM = $ARGV[2];
-my $MediumV = $ARGV[3];                                                            # reads in command line arguments
-my $MediumM = $ARGV[4];
-my $LargeV = $ARGV[5];
-my $LargeM = $ARGV[6];
+my $MaxBlock = $ARGV[1];
+my $SmallV = $ARGV[2];                                                            # reads in command line arguments
+my $SmallM = $ARGV[3];
+my $MediumV = $ARGV[4];                                                            # reads in command line arguments
+my $MediumM = $ARGV[5];
+my $LargeV = $ARGV[6];
+my $LargeM = $ARGV[7];
 my %Mass = (
   "$SmallV" => "$SmallM",
   "$MediumV"=> "$MediumM",
@@ -74,7 +75,7 @@ foreach my $vol ($SmallV, $MediumV, $LargeV) {
 print"File Read in Complete!\n";
 
 print"Finding Delta Beta:\n";
-my $block = 4;                                  
+my $block = $MaxBlock;                                  
 foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
@@ -181,7 +182,7 @@ foreach my $t (@smearingt) {
     }
   }
 }
-$block = 3;                                  
+$block--;                                  
 foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
@@ -305,11 +306,11 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   foreach my $t (@smearingt) {
     my (@db2, @db3) = ();
     foreach my $loop (0,1,2,3,4) {
-      if ($Full_delta_beta{3}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db2, $Full_delta_beta{3}{$largeb}{$loop}{$t});
+      if ($Full_delta_beta{$block}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db2, $Full_delta_beta{$block}{$largeb}{$loop}{$t});
       }
-      if ($Full_delta_beta{4}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db3, $Full_delta_beta{4}{$largeb}{$loop}{$t});
+      if ($Full_delta_beta{$block+1}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db3, $Full_delta_beta{$block+1}{$largeb}{$loop}{$t});
       }
     }
     if ((@db2 < 2)||(@db3 < 2)) {next;}

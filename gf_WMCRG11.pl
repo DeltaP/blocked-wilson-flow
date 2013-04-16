@@ -11,10 +11,11 @@ use Math::Polynomial::Solve qw(poly_roots);
 use Chart::Gnuplot;
 
 my $NF     = $ARGV[0];
-my $SmallV = $ARGV[1];                                                            # reads in command line arguments
-my $SmallM = $ARGV[2];
-my $LargeV = $ARGV[3];
-my $LargeM = $ARGV[4];
+my $MaxBlock = $ARGV[1];
+my $SmallV = $ARGV[2];                                                            # reads in command line arguments
+my $SmallM = $ARGV[3];
+my $LargeV = $ARGV[4];
+my $LargeM = $ARGV[5];
 my %Mass = (
   "$SmallV" => "$SmallM",
   "$LargeV" => "$LargeM",
@@ -194,11 +195,13 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   foreach my $t (@smearingt) {
     my (@db2, @db3) = ();
     foreach my $loop (0,1,2,3,4) {
-      if ($Full_delta_beta{2}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db2, $Full_delta_beta{2}{$largeb}{$loop}{$t});
+      my $block = $MaxBlock;
+      if ($Full_delta_beta{$block}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db3, $Full_delta_beta{$block}{$largeb}{$loop}{$t});
       }
-      if ($Full_delta_beta{3}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db3, $Full_delta_beta{3}{$largeb}{$loop}{$t});
+      $block--;
+      if ($Full_delta_beta{$block}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db2, $Full_delta_beta{$block}{$largeb}{$loop}{$t});
       }
     }
     if ((@db2 < 2)||(@db3 < 2)) {next;}

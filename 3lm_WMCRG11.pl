@@ -11,12 +11,13 @@ use Math::Polynomial::Solve qw(poly_roots);
 use Chart::Gnuplot;
 
 my $NF     = $ARGV[0];
-my $SmallV = $ARGV[1];                                                            # reads in command line arguments
-my $SmallM = $ARGV[2];
-my $MediumV = $ARGV[3];                                                            # reads in command line arguments
-my $MediumM = $ARGV[4];
-my $LargeV = $ARGV[5];
-my $LargeM = $ARGV[6];
+my $MaxBlock = $ARGV[1];
+my $SmallV = $ARGV[2];                                                            # reads in command line arguments
+my $SmallM = $ARGV[3];
+my $MediumV = $ARGV[4];                                                            # reads in command line arguments
+my $MediumM = $ARGV[5];
+my $LargeV = $ARGV[6];
+my $LargeM = $ARGV[7];
 my %Mass = (
   "$SmallV" => "$SmallM",
   "$MediumV"=> "$MediumM",
@@ -33,8 +34,8 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $MediumV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/WMCRG7_";
-  my @files = grep { /WMCRG7_(high|low|mix)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my $base_name = "${NF}flav_${vol}/WMCRG11_";
+  my @files = grep { /WMCRG11_(high|low|mix)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -74,7 +75,7 @@ foreach my $vol ($SmallV, $MediumV, $LargeV) {
 print"File Read in Complete!\n";
 
 print"Finding Delta Beta:\n";
-my $block = 4;                                  
+my $block = $MaxBlock;                                  
 foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
@@ -141,7 +142,7 @@ foreach my $t (@smearingt) {
         next;
       }
       my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-        output => "Plots_${NF}_WMCRG7/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+        output => "Plots_${NF}_WMCRG11/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
         title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
         xlabel => "Beta",
         ylabel => "Expectation Value",
@@ -181,7 +182,7 @@ foreach my $t (@smearingt) {
     }
   }
 }
-$block = 3;                                  
+$block--;                                  
 foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
@@ -248,7 +249,7 @@ foreach my $t (@smearingt) {
         next;
       }
       my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-        output => "Plots_${NF}_WMCRG7/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+        output => "Plots_${NF}_WMCRG11/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
         title  => "Deltabeta for beta ${largeb}, matching with ${MediumV} blocked ${block} after ${t} smearing",
         xlabel => "Beta",
         ylabel => "Expectation Value",
@@ -305,11 +306,11 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   foreach my $t (@smearingt) {
     my (@db2, @db3) = ();
     foreach my $loop (0,1,2,3,4) {
-      if ($Full_delta_beta{3}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db2, $Full_delta_beta{3}{$largeb}{$loop}{$t});
+      if ($Full_delta_beta{$block}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db2, $Full_delta_beta{$block}{$largeb}{$loop}{$t});
       }
-      if ($Full_delta_beta{4}{$largeb}{$loop}{$t} ne 'NaN') {
-        push(@db3, $Full_delta_beta{4}{$largeb}{$loop}{$t});
+      if ($Full_delta_beta{$block+1}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db3, $Full_delta_beta{$block+1}{$largeb}{$loop}{$t});
       }
     }
     if ((@db2 < 2)||(@db3 < 2)) {next;}
@@ -398,7 +399,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
 
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-    output => "Plots_${NF}_WMCRG7/avg_smearing_time/avg_${largeb}.png",
+    output => "Plots_${NF}_WMCRG11/avg_smearing_time/avg_${largeb}.png",
     title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
     xlabel => "Smearing",
     ylabel => "Delta Beta",
@@ -446,7 +447,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked 3",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5, $dataSet6, $dataSet7, $dataSet8);
-    open FILE, ">", "Plots_${NF}_WMCRG7/out/avg_${largeb}" or die $!;
+    open FILE, ">", "Plots_${NF}_WMCRG11/out/avg_${largeb}" or die $!;
     print FILE zup \(@plott, @db2_avg, @db2_err, @db3_avg, @db3_err); 
     print FILE "\n"; 
     close FILE;
