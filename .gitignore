@@ -6,8 +6,6 @@
 *.aux
 *.pdf
 
-summary/summary.aux
-
 4flav_1224
 4flav_1632
 4flav_2448
@@ -21,24 +19,16 @@ summary/summary.aux
 12flav_3264
 
 wilson_flow_plots
-Plots_4flav
-Plots_8flav
-Plots_8flav2
-Plots_12flav
-Plots_oldaction12flav
-Plots_12flav2
-Plots_12flav3
-Plots_12flav4
-Plots_12flav5
-Plots_12flav6
-Plots_12flav7
-Plots_12_WMCRG2
-Plots_12_WMCRG7
-12flav_816
-7_1224-2448
-7_1632-3264
-7_3lm_24
-7_3lm_48
-Plots_12_WMCRG8
-Plots_12_WMCRG9
-Plots_12_WMCRG11
+archive
+12-24_36_11/
+12-24_36_9/
+12flav_816/
+16-32_24_11/
+16-32_24_9/
+16-32_48_11/
+16-32_48_9/
+3lm_24_11/
+3lm_24_9/
+3lm_48_11/
+3lm_48_9/
+lib

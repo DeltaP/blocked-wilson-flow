@@ -23,6 +23,12 @@ my %Mass = (
   "$MediumV"=> "$MediumM",
   "$LargeV" => "$LargeM",
 );
+my $lv = substr($LargeV,0,2);
+my $bv = $lv/(2**$MaxBlock);
+my $bv2 = 2*$bv;
+my $Dir = "3lm_${bv}${bv2}_9";
+print "Saving to directory: $Dir\n";
+#add line to clear path
 
 sub zup {
   join "\n", map { my $i = $_; join ' ', map $_->[ $i ], @_ } 0 .. $#{
@@ -142,7 +148,7 @@ foreach my $t (@smearingt) {
         next;
       }
       my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-        output => "Plots_${NF}_WMCRG7/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+        output => "${Dir}/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
         title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
         xlabel => "Beta",
         ylabel => "Expectation Value",
@@ -249,7 +255,7 @@ foreach my $t (@smearingt) {
         next;
       }
       my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-        output => "Plots_${NF}_WMCRG7/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+        output => "${Dir}/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
         title  => "Deltabeta for beta ${largeb}, matching with ${MediumV} blocked ${block} after ${t} smearing",
         xlabel => "Beta",
         ylabel => "Expectation Value",
@@ -305,7 +311,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   my (@db2_avg, @db2_err, @db3_avg, @db3_err, @plott) = ();
   foreach my $t (@smearingt) {
     my (@db2, @db3) = ();
-    foreach my $loop (0,1,2,3,4) {
+    foreach my $loop (0,1,2,3) { #took out 8 link loop
       if ($Full_delta_beta{$block}{$largeb}{$loop}{$t} ne 'NaN') {
         push(@db2, $Full_delta_beta{$block}{$largeb}{$loop}{$t});
       }
@@ -399,7 +405,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
 
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-    output => "Plots_${NF}_WMCRG7/avg_smearing_time/avg_${largeb}.png",
+    output => "${Dir}/avg_smearing_time/avg_${largeb}.png",
     title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
     xlabel => "Smearing",
     ylabel => "Delta Beta",
@@ -447,7 +453,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked 3",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5, $dataSet6, $dataSet7, $dataSet8);
-    open FILE, ">", "Plots_${NF}_WMCRG7/out/avg_${largeb}" or die $!;
+    open FILE, ">", "${Dir}/out/avg_${largeb}" or die $!;
     print FILE zup \(@plott, @db2_avg, @db2_err, @db3_avg, @db3_err); 
     print FILE "\n"; 
     close FILE;

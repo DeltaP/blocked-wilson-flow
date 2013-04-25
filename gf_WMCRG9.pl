@@ -20,6 +20,13 @@ my %Mass = (
   "$SmallV" => "$SmallM",
   "$LargeV" => "$LargeM",
 );
+my $sv = substr($SmallV,0,2);
+my $lv = substr($LargeV,0,2);
+my $bv = $lv/(2**$MaxBlock);
+my $bv2 = 2*$bv;
+my $Dir = "${sv}-${lv}_${bv}${bv2}_9";
+print "Saving to directory: $Dir\n";
+#add line to clear path
 
 sub zup {
   join "\n", map { my $i = $_; join ' ', map $_->[ $i ], @_ } 0 .. $#{
@@ -60,7 +67,7 @@ foreach my $vol ($SmallV, $LargeV) {
       foreach my $b (@{$block{$vol}}) {                                           # beta values
         foreach my $t (@smearingt) {                                              # and smearing times
           $avg{$vol}{$beta}{$t}{$loop}{$b} = stat_mod::avg(@{$val{$vol}{$beta}{$t}{$loop}{$b}});     # to find statistics
-          $err{$vol}{$beta}{$t}{$loop}{$b} = stat_mod::stdev(@{$val{$vol}{$beta}{$t}{$loop}{$b}});
+          $err{$vol}{$beta}{$t}{$loop}{$b} = stat_mod::sterr(@{$val{$vol}{$beta}{$t}{$loop}{$b}});
         }
       }
     }
@@ -128,7 +135,7 @@ foreach my $block (@{$block{$LargeV}}) {
           if ($r =~ /i$/){next;}
           if (($r < $x1[0])||($r>$x1[$#x1])){next;}          #skips imaginary roots
           $Full_delta_beta{$block}{$largeb}{$loop}{$t} = $largeb - $r;            # gets the right root
-          $beta_diff = $r;                                                        # right now only written for linear fit
+          $beta_diff = $r;
           $hasroot++;
         }
         if ($hasroot != 1) {
@@ -137,7 +144,7 @@ foreach my $block (@{$block{$LargeV}}) {
           next;
         }
         my $chart = Chart::Gnuplot->new(                                          # Create chart object 
-          output => "Plots_${NF}_WMCRG9/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
+          output => "${Dir}/deltabeta/${largeb}_${block}_${t}_${loop}_full.png",
           title  => "Deltabeta for beta ${largeb}, matching with ${LargeV} blocked ${block} after ${t} smearing",
           xlabel => "Beta",
           ylabel => "Expectation Value",
@@ -151,7 +158,7 @@ foreach my $block (@{$block{$LargeV}}) {
         $chart->command("set label 3 \"Large V chi^2/dof:  $chi2\"");
         $chart->command("set label 3 at graph 0.02, 0.65 tc lt 3");
         #if ($hasroot > 0) {
-          $chart->command("set arrow from $largeb,$lv_value to $beta_diff,$lv_value");
+          $chart->command("set arrow from $largeb,$lv_fit_value to $beta_diff,$lv_fit_value");
         #}
         my $dataSet0 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for small volumes
           xdata => \@x1,
@@ -194,7 +201,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
   my (@db2_avg, @db2_err, @db3_avg, @db3_err, @plott) = ();
   foreach my $t (@smearingt) {
     my (@db2, @db3) = ();
-    foreach my $loop (0,1,2,3,4) {
+    foreach my $loop (0,1,2,3) { #removed 8 link loop
       my $block = $MaxBlock;
       if ($Full_delta_beta{$block}{$largeb}{$loop}{$t} ne 'NaN') {
         push(@db3, $Full_delta_beta{$block}{$largeb}{$loop}{$t});
@@ -220,8 +227,11 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     my $diff;
     $diff = $db2_avg[$count] - $db3_avg[$count];
     if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
+    elsif (($die == 0) && ($diff < 0)) {$index --;}
     $count ++;
   }
+  if ($index < 0) {$index=$#plott-2;}
+  elsif ($index == $#plott) {$index-=2;}
 
   my $x=pdl(@plott[$index-1..$index+1]);                                                              # puts data into a piddle for fitting
   my $y2=pdl(@db2_avg[$index-1..$index+1]);
@@ -283,14 +293,16 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     $Avg_delta_beta_optimal_4{$largeb}=$a2_plus*$r+$b2_plus;
     print"$largeb\t$r\t$Avg_delta_beta_optimal_4{$largeb}\n";
   }
-  print"PLOT ";
-  my $high_err=($Avg_delta_beta_optimal_1{$largeb}+$Avg_delta_beta_optimal_3{$largeb})/2;
-  my $low_err=($Avg_delta_beta_optimal_2{$largeb}+$Avg_delta_beta_optimal_4{$largeb})/2;
-  print"$largeb $Avg_t_optimal_1{$largeb} $Avg_delta_beta_optimal{$largeb} $low_err $high_err\n";
 
+  print"PLOT ";
+  my $low_t_err=($Avg_t_optimal_2{$largeb}+$Avg_t_optimal_3{$largeb})/2;
+  my $high_t_err=($Avg_t_optimal_1{$largeb}+$Avg_t_optimal_4{$largeb})/2;
+  my $high_db_err=($Avg_delta_beta_optimal_1{$largeb}+$Avg_delta_beta_optimal_3{$largeb})/2;
+  my $low_db_err=($Avg_delta_beta_optimal_2{$largeb}+$Avg_delta_beta_optimal_4{$largeb})/2;
+  print"$largeb $Avg_t_optimal_1{$largeb} $low_t_err $high_t_err $Avg_delta_beta_optimal{$largeb} $low_db_err $high_db_err\n";
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
-    output => "Plots_${NF}_WMCRG9/avg_smearing_time/avg_${largeb}.png",
+    output => "${Dir}/avg_smearing_time/avg_${largeb}.png",
     title  => "Delta Beta as a function of smearing time for Beta: ${largeb}",
     xlabel => "Smearing",
     ylabel => "Delta Beta",
@@ -338,7 +350,7 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
       title => "Fit: Blocked 3",
     );
     $chart->plot2d($dataSet1, $dataSet2, $dataSet3, $dataSet4, $dataSet5, $dataSet6, $dataSet7, $dataSet8);
-    open FILE, ">", "Plots_${NF}_WMCRG9/out/avg_${largeb}" or die $!;
+    open FILE, ">", "${Dir}/out/avg_${largeb}" or die $!;
     print FILE zup \(@plott, @db2_avg, @db2_err, @db3_avg, @db3_err); 
     print FILE "\n"; 
     close FILE;
