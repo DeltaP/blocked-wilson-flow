@@ -15,6 +15,22 @@ def numericalSort(value):
     parts[1::2] = map(int, parts[1::2])
     return parts
 
+def uniq(seq, idfun=None):  
+    # order preserving 
+    if idfun is None: 
+        def idfun(x): return x 
+    seen = {} 
+    result = [] 
+    for item in seq: 
+        marker = idfun(item) 
+        # in old Python versions: 
+        # if seen.has_key(marker) 
+        # but in new ones: 
+        if marker in seen: continue 
+        seen[marker] = 1 
+        result.append(item) 
+    return result
+
 def main(argv):
   flav = ''
   tag = ''
@@ -55,7 +71,7 @@ def main(argv):
   ind = MultiIndex.from_tuples(zipped, names=['smearing', 'block_level', 'observable'])
   data = Series(value, index=ind)
   iact = []
-  uni_zipped = set(zipped)
+  uni_zipped = uniq(zipped)
   for i in uni_zipped:
     timeseries = data.ix[i].values
     mean = np.mean(timeseries)
