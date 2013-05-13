@@ -5,11 +5,9 @@ from pandas import Series, DataFrame, MultiIndex
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
-import os
 import re
 import sys
 import getopt
-import random
 
 numbers = re.compile(r'(\d+)')
 def numericalSort(value):
@@ -36,7 +34,6 @@ def main(argv):
 
   parse_tag = re.split('_', tag)
   vol = parse_tag[2]
-  montt = []
   smear = []
   block = []
   obser = []
@@ -44,14 +41,12 @@ def main(argv):
   
   filelist = sorted(glob.glob(flav+'flav_'+vol+'/'+tag+'.*'), key=numericalSort)
   for filename in filelist:
-    extension = os.path.splitext(filename)[1][1:]
     f = open(filename, 'r')
     ftext = f.readlines()
     for line in ftext:
       if re.match('^LOOPS.*', line):
         line=line.strip()
         junk, smear_t, loop, junk, blk, junk, val = re.split('\s+', line)
-        montt.append(extension)
         smear.append(smear_t)
         block.append(blk)
         obser.append(loop)
