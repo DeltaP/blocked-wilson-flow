@@ -36,6 +36,7 @@ def main(argv):
 
   parse_tag = re.split('_', tag)
   vol = parse_tag[2]
+  montt = []
   smear = []
   block = []
   obser = []
@@ -43,22 +44,35 @@ def main(argv):
   
   filelist = sorted(glob.glob(flav+'flav_'+vol+'/'+tag+'.*'), key=numericalSort)
   for filename in filelist:
-    print 'Reading filename:  '+filename
+    extension = os.path.splitext(filename)[1][1:]
     f = open(filename, 'r')
     ftext = f.readlines()
     for line in ftext:
       if re.match('^LOOPS.*', line):
         line=line.strip()
         junk, smear_t, loop, junk, blk, junk, val = re.split('\s+', line)
+        montt.append(extension)
         smear.append(smear_t)
         block.append(blk)
         obser.append(loop)
         value.append(float(val))
-  data = Series(value, index=[smear, block, obser])
-  data_list = data.ix[('0.07','4','4')].values
-  autoc = np.correlate(data_list, data_list, mode='full')
-  iact = sum(autoc[autoc.size/2:]/autoc[autoc.size/2])
-
+  zipped = zip(smear, block, obser)
+  ind = MultiIndex.from_tuples(zipped, names=['smearing', 'block_level', 'observable'])
+  data = Series(value, index=ind)
+  iact = []
+  uni_zipped = set(zipped)
+  for i in uni_zipped:
+    timeseries = data.ix[i].values
+    mean = np.mean(timeseries)
+    timeseries = np.array([x - mean for x in timeseries])
+    autocorr_f = np.correlate(timeseries, timeseries, mode='full')
+    iact.append(sum(autocorr_f[autocorr_f.size/2:]/autocorr_f[autocorr_f.size/2]))
+    #temp = autoc[autoc.size/2:]/autoc[autoc.size/2]
+    #plt.plot(temp)
+    #plt.show()
+  ind = MultiIndex.from_tuples(uni_zipped, names=['smearing', 'block_level', 'observable'])
+  result = Series(iact, index=ind)
+  print result
 
 if __name__ == "__main__":
    main(sys.argv[1:])
