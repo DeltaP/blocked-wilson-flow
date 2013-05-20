@@ -26,7 +26,7 @@ my %Mass = (
 my $lv = substr($LargeV,0,2);
 my $bv = $lv/(2**$MaxBlock);
 my $bv2 = 2*$bv;
-my $Dir = "3lm_${bv}${bv2}_9";
+my $Dir = "3lm_${bv}${bv2}_7";
 print "Saving to directory: $Dir\n";
 #add line to clear path
 
@@ -41,7 +41,7 @@ my @smearingt = ();
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $MediumV, $LargeV) {
   my $base_name = "${NF}flav_${vol}/WMCRG7_";
-  my @files = grep { /WMCRG7_(high|low|mix)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my @files = grep { /WMCRG7_(high|low|mix)_${vol}_.*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -72,7 +72,7 @@ foreach my $vol ($SmallV, $MediumV, $LargeV) {
       foreach my $b (@{$block{$vol}}) {                                           # beta values
         foreach my $t (@smearingt) {                                              # and smearing times
           $avg{$vol}{$beta}{$t}{$loop}{$b} = stat_mod::avg(@{$val{$vol}{$beta}{$t}{$loop}{$b}});     # to find statistics
-          $err{$vol}{$beta}{$t}{$loop}{$b} = stat_mod::stdev(@{$val{$vol}{$beta}{$t}{$loop}{$b}});
+          $err{$vol}{$beta}{$t}{$loop}{$b} = stat_mod::sterr(@{$val{$vol}{$beta}{$t}{$loop}{$b}});
         }
       }
     }
@@ -86,7 +86,6 @@ foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
     foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
-      my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                 # large volume value at large volume beta
       my @x1 = @{$Beta{$MediumV}};                                              # arrays for plots
       my @y1 = ();
       my @e1 = ();
@@ -193,7 +192,6 @@ foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
     foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
-      my $lv_value = $avg{$MediumV}{$largeb}{$t}{$loop}{$block};                # large volume value at large volume beta
       my @x1 = @{$Beta{$SmallV}};                                               # arrays for plots
       my @y1 = ();
       my @e1 = ();
@@ -335,8 +333,11 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     my $diff;
     $diff = $db2_avg[$count] - $db3_avg[$count];
     if (($diff > 0) && ($die == 0)) {$index = $count; $die = 1}
+    elsif (($die == 0) && ($diff < 0)) {$index --;}
     $count ++;
   }
+  if ($index < 0) {$index=$#plott-2;}
+  elsif ($index == $#plott) {$index-=2;}
 
   my $x=pdl(@plott[$index-1..$index+1]);                                                              # puts data into a piddle for fitting
   my $y2=pdl(@db2_avg[$index-1..$index+1]);
@@ -398,11 +399,13 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     $Avg_delta_beta_optimal_4{$largeb}=$a2_plus*$r+$b2_plus;
     print"$largeb\t$r\t$Avg_delta_beta_optimal_4{$largeb}\n";
   }
-  print"PLOT ";
-  my $high_err=($Avg_delta_beta_optimal_1{$largeb}+$Avg_delta_beta_optimal_3{$largeb})/2;
-  my $low_err=($Avg_delta_beta_optimal_2{$largeb}+$Avg_delta_beta_optimal_4{$largeb})/2;
-  print"$largeb $Avg_t_optimal_1{$largeb} $Avg_delta_beta_optimal{$largeb} $low_err $high_err\n";
 
+  print"PLOT ";
+  my $low_t_err=($Avg_t_optimal_2{$largeb}+$Avg_t_optimal_3{$largeb})/2;
+  my $high_t_err=($Avg_t_optimal_1{$largeb}+$Avg_t_optimal_4{$largeb})/2;
+  my $high_db_err=($Avg_delta_beta_optimal_1{$largeb}+$Avg_delta_beta_optimal_3{$largeb})/2;
+  my $low_db_err=($Avg_delta_beta_optimal_2{$largeb}+$Avg_delta_beta_optimal_4{$largeb})/2;
+  print"$largeb $Avg_t_optimal_1{$largeb} $low_t_err $high_t_err $Avg_delta_beta_optimal{$largeb} $low_db_err $high_db_err\n";
 
   my $chart = Chart::Gnuplot->new(                                              # Create chart object 
     output => "${Dir}/avg_smearing_time/avg_${largeb}.png",

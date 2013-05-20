@@ -41,7 +41,7 @@ my @smearingt = ();
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $MediumV, $LargeV) {
   my $base_name = "${NF}flav_${vol}/WMCRG11_";
-  my @files = grep { /WMCRG11_(high|low|mix)_${vol}_[0-9].[0-9]_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
+  my @files = grep { /WMCRG11_(high|low|mix)_${vol}_.*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
     my @split = split(/_/, $f);
@@ -86,7 +86,6 @@ foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
     foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
-      my $lv_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};                 # large volume value at large volume beta
       my @x1 = @{$Beta{$MediumV}};                                              # arrays for plots
       my @y1 = ();
       my @e1 = ();
@@ -193,7 +192,6 @@ foreach my $t (@smearingt) {
   print"... Large blocking:  $block\tSmearing Time: $t\n";
   foreach my $loop (0,1,2,3,4) {
     foreach my $largeb (@{$Beta{$LargeV}}) {                                    # loops over large volume beta
-      my $lv_value = $avg{$MediumV}{$largeb}{$t}{$loop}{$block};                # large volume value at large volume beta
       my @x1 = @{$Beta{$SmallV}};                                               # arrays for plots
       my @y1 = ();
       my @e1 = ();
