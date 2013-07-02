@@ -8,6 +8,8 @@ import sys
 import getopt
 import argparse
 from collections import defaultdict
+from pylab import *
+from scipy import stats
 
 def uniq(seq, idfun=None):  
     # order preserving 
@@ -52,6 +54,7 @@ while argdict['rest']:
 
 value = defaultdict(list)
 for i in range(count):
+  print i
   betal=[]
   grab = '12flav_' + vol[i] + '/WMCRG' + sch[i] + '*' + vol[i] + '*' + '_0.0.*'
   print grab
@@ -71,8 +74,15 @@ for i in range(count):
               value[beta].append(float(val))
   x = []
   y = []
-  for b in sorted(uniq(betal)):
-    np.append(x, b)
-    np.append(y, np.mean(value[b]))
-    plt.plot(x,y)
+  e = []
+  for b in betal:
+    x.append(b)
+    y.append(np.mean(value[b]))
+    e.append(stats.sem(value[b]))
+  ax = np.array(x)
+  ay = np.array(y)
+  ae = np.array(e)
+  name = vol[i]+' '+blk[i]
+  errorbar(ax , ay, yerr=ae, fmt='o', label=name)
+plt.legend()
 plt.show()

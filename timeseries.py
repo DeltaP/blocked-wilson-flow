@@ -42,5 +42,6 @@ for filename in filelist:
 
 for key in value:
   plt.title('Blocking step '+key)
+  plt.subplot(len(value), 1, key)
   plt.plot(value[key])
-  plt.show()
+plt.show()
