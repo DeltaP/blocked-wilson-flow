@@ -83,6 +83,8 @@ for i in range(count):
   ay = np.array(y)
   ae = np.array(e)
   name = vol[i]+' '+blk[i]
-  errorbar(ax , ay, yerr=ae, fmt='o', label=name)
+  errorbar(ax , ay, yerr=ae, fmt='.', label=name)
+#plt.set_xlim(left,right)
 plt.legend()
+plt.autoscale(enable=True, tight=False)
 plt.show()
