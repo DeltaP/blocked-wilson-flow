@@ -24,7 +24,7 @@ vol = argdict['volumes']
 
 for volume in vol:
   L = int(volume[:len(volume)/2])
-  t = (c*L)**2/8
+  t = round(((c*L)**2/8)/(0.02))*0.02
   betal    = defaultdict(list)
   data     = defaultdict(list)
   g2       = defaultdict(dict)
@@ -49,5 +49,6 @@ for volume in vol:
     y.append(g2[(volume,b)])
   ax = np.array(x)
   ay = np.array(y)
-  plt.plot(ax, ay,linestyle='None', marker='.')
+  plt.plot(ax, ay,linestyle='None', marker='.', label=volume)
+plt.legend()
 plt.show()
