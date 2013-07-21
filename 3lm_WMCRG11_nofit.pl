@@ -116,20 +116,7 @@ foreach my $t (@smearingt) {
       $chi1/=(@x1-4-1);
       #print"CHI^2 small volume:  $chi1\n";
 
-      my $x2=pdl(@x2);                                                          # puts small volume data into piddle for fitting
-      my $y2=pdl(@y2);
-      my $e2=pdl(@e2);
-      (my $fit2 , my $coeffs2)=fitpoly1d $x2, $y2, 2;                           # fits the small volumes
-      #my $a2=$coeffs2->at(3);                                                   # extracts out the coefficients
-      #my $b2=$coeffs2->at(2);
-      my $a2=$coeffs2->at(1);
-      my $b2=$coeffs2->at(0);
-      my $temp2=pdl(($fit2-$y2)**2/$e2**2);
-      my $chi2=sum $temp2;
-      $chi2/=(@x1-2-1);
-      #print"CHI^2 large volume:  $chi2\n";
-
-      my $lv_fit_value = $a2*$largeb+$b2;
+      my $lv_fit_value = $avg{$LargeV}{$largeb}{$t}{$loop}{$block};
       my @roots=poly_roots(($a1),($b1),($c1),($d1-$lv_fit_value));              # solves for the difference between the fit and the large mass value
       my $beta_diff;
       my $hasroot = 0;
@@ -157,7 +144,7 @@ foreach my $t (@smearingt) {
       $chart->command("set label 1 at graph 0.02, 0.85 tc lt 3");
       $chart->command("set label 2 \"Small V chi^2/dof:  $chi1\"");
       $chart->command("set label 2 at graph 0.02, 0.75 tc lt 3");
-      $chart->command("set label 3 \"Large V chi^2/dof:  $chi2\"");
+      $chart->command("set label 3 \"Large V chi^2/dof:  NaN\"");
       $chart->command("set label 3 at graph 0.02, 0.65 tc lt 3");
       #if ($hasroot > 0) {
         $chart->command("set arrow from $largeb,$lv_fit_value to $beta_diff,$lv_fit_value");
@@ -178,11 +165,7 @@ foreach my $t (@smearingt) {
         func => "$a1*x**3+$b1*x**2+$c1*x+$d1",
         title => "Fit to Small Volume",
       );
-      my $dataSet3 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-        func => "$a2*x+$b2",
-        title => "Fit to Large Volume",
-      );
-      $chart->plot2d($dataSet0, $dataSet1, $dataSet2, $dataSet3);               # plots the chart
+      $chart->plot2d($dataSet0, $dataSet1, $dataSet2);               # plots the chart
     }
   }
 }
@@ -460,4 +443,80 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     print FILE "\n"; 
     close FILE;
 }
-print"Extrapolating Delta Beta Averaging over Loops First Complete!\n";
+print"Interpolating Delta Beta Averaging over Loops First Complete!\n";
+
+
+print"Forcing Topt Values:\n";
+my %topt_low  = (
+  '4.0' => '0.124987400123536',
+  '4.5' => '',
+  '5.0' => '',
+  '5.5' => '',
+  '6.0' => '0.128522086622257',
+  '6.5' => '',
+  '7.0' => '',
+  '7.5' => '',
+  '8.0' => '',
+);
+
+my %topt      = (
+  '4.0' => '0.130543563707695',
+  '4.5' => '',
+  '5.0' => '',
+  '5.5' => '',
+  '6.0' => '0.132071438907963',
+  '6.5' => '',
+  '7.0' => '',
+  '7.5' => '',
+  '8.0' => '',
+);
+
+my %topt_high = (
+  '4.0' => '0.163442279582233',
+  '4.5' => '',
+  '5.0' => '',
+  '5.5' => '',
+  '6.0' => '0.150895948441015',
+  '6.5' => '',
+  '7.0' => '',
+  '7.5' => '',
+  '8.0' => '',
+);
+
+foreach my $largeb (@{$Beta{$LargeV}}) {
+  print"... Beta:  $largeb\n";
+  my (@db_avg, @db_err, @plott) = ();
+  foreach my $t (@smearingt) {
+    my @db = ();
+    foreach my $loop (0,1,2,3) { #took out 8 link loop
+      if ($Full_delta_beta{$MaxBlock}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db, $Full_delta_beta{$MaxBlock}{$largeb}{$loop}{$t});
+      }
+    }
+    if ((@db < 2)||(@db < 2)) {next;}
+    push(@db_avg,stat_mod::avg(@db));
+    push(@db_err,stat_mod::stdev(@db));
+    push(@plott,$t);
+  }
+  if (@db_avg < 2) {next;}
+  
+  my $x=pdl(@plott);
+  my $y=pdl(@db_avg);
+  my $e=pdl(@db_err);
+
+  (my $fit, my $coeffs)=fitpoly1d $x, $y, 4;
+  my $a=$coeffs->at(3);
+  my $b=$coeffs->at(2);
+  my $c=$coeffs->at(1);
+  my $d=$coeffs->at(0);
+  my $temp=pdl(($fit-$y)**2/$e**2);
+  my $chi=sum $temp;
+  $chi/=(@plott-4-1);
+  print"Chi^2 / dof:  $chi\n";
+
+  my $dbfit_low = $a*$topt_low{$largeb}**3+$b*$topt_low{$largeb}**2+$c*$topt_low{$largeb}+$d;
+  my $dbfit = $a*$topt{$largeb}**3+$b*$topt{$largeb}**2+$c*$topt{$largeb}+$d;
+  my $dbfit_high = $a*$topt_high{$largeb}**3+$b*$topt_high{$largeb}**2+$c*$topt_high{$largeb}+$d;
+  print "FORCE $largeb $dbfit $dbfit_low $dbfit_high\n";
+}
+print"Forcing Topt Values Complete!\n";

@@ -1,8 +1,11 @@
 #!/usr/bin/python
 
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import math
+import scipy.stats
 import glob
 import re
 import sys
@@ -28,9 +31,10 @@ for volume in vol:
   betal    = defaultdict(list)
   data     = defaultdict(list)
   g2       = defaultdict(dict)
+  g2_err   = defaultdict(dict)
   tmparry  = []
 
-  filelist = glob.glob('12flav_'+volume+'/Wflow_'+'*'+volume+'*')
+  filelist = glob.glob('12flav_'+volume+'/wflow/Wflow_'+'*'+volume+'*')
   for filename in filelist:
     tmparry = re.split('_', filename)
     beta = tmparry[4]
@@ -41,14 +45,20 @@ for volume in vol:
 
   for b in betal[volume]:
     t2E = np.mean(data[b])
-    g2[(volume,b)] = (128*math.pi**2*t2E)/(3*(3-1)*(1+dc))
+    t2E_err = scipy.stats.sem(data[b])
+    g2[(volume,b)] = (128*math.pi**2*t2E)/(3*(3**2-1)*(1+dc))
+    g2_err[(volume,b)] = (128*math.pi**2*t2E_err)/(3*(3**2-1)*(1+dc))
+
   x = []
   y = []
+  e = []
   for b in betal[volume]:
     x.append(b)
     y.append(g2[(volume,b)])
+    e.append(g2_err[(volume,b)])
   ax = np.array(x)
   ay = np.array(y)
-  plt.plot(ax, ay,linestyle='None', marker='.', label=volume)
+  ae = np.array(e)
+  plt.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', label=volume)
 plt.legend()
-plt.show()
+plt.savefig("wflow.png", format='png')
