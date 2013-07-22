@@ -39,7 +39,7 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $MediumV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/WMCRG7_";
+  my $base_name = "${NF}flav_${vol}/sch7/WMCRG7_";
   my @files = grep { /WMCRG7_(high|low|mix)_${vol}_.*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";

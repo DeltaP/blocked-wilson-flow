@@ -6,15 +6,22 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import math
 import scipy.stats
+import scipy
 import glob
 import re
 import sys
 import getopt
 import argparse
 from collections import defaultdict
+from scipy import optimize
 
 s  = 2
 dc = 0
+
+#fitfunc = lambda c, x: -1 / (c[0] + c[1]*(12.0/x) + c[2]*(12.0/x)**2 + c[3]*(12.0/x)**3 - x/12.0)
+fitfunc = lambda c, x: c[0] + c[1]*x + c[2]*x**2 + c[3]*x**3
+errfunc = lambda c, x, y, err: (fitfunc(c, x) - y) / err
+c_in = [-0.01, -0.01, 10., 10.]   # Order-of-magnitude initial guesses
 
 parser = argparse.ArgumentParser(description='Wilson Flow Matching.')
 parser.add_argument('c', metavar='constant', type=float, nargs=1, help='Enter the smearing constant that defines the extent of the smearing you are interested in.')
@@ -33,16 +40,18 @@ for volume in vol:
   g2       = defaultdict(dict)
   g2_err   = defaultdict(dict)
   tmparry  = []
+  tmpbetal = []
 
   filelist = glob.glob('12flav_'+volume+'/wflow/Wflow_'+'*'+volume+'*')
   for filename in filelist:
     tmparry = re.split('_', filename)
     beta = tmparry[4]
-    betal[volume].append(beta)
+    tmpbetal.append(beta)
     ftext = [i for i in open(filename) if i.startswith('WFLOW ' + str(t))==True][0]
     tmparry = re.split('\s+',ftext)
     data[beta].append(float(tmparry[4]))
 
+  betal[volume]=(set(tmpbetal))
   for b in betal[volume]:
     t2E = np.mean(data[b])
     t2E_err = scipy.stats.sem(data[b])
@@ -52,13 +61,17 @@ for volume in vol:
   x = []
   y = []
   e = []
-  for b in betal[volume]:
-    x.append(b)
-    y.append(g2[(volume,b)])
-    e.append(g2_err[(volume,b)])
+  for b in sorted(betal[volume]):
+    x.append(float(b))
+    y.append(float(g2[(volume,b)]))
+    e.append(float(g2_err[(volume,b)]))
   ax = np.array(x)
   ay = np.array(y)
   ae = np.array(e)
+  coeff, success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
   plt.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', label=volume)
+  plt.plot(ax, fitfunc(coeff,ax))
 plt.legend()
-plt.savefig("wflow.png", format='png')
+plt.savefig("plots/wflow.png", format='png')
+
+
