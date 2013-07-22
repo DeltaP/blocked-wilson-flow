@@ -21,7 +21,7 @@ dc = 0
 #fitfunc = lambda c, x: -1 / (c[0] + c[1]*(12.0/x) + c[2]*(12.0/x)**2 + c[3]*(12.0/x)**3 - x/12.0)
 fitfunc = lambda c, x: c[0] + c[1]*x + c[2]*x**2 + c[3]*x**3
 errfunc = lambda c, x, y, err: (fitfunc(c, x) - y) / err
-c_in = [-0.01, -0.01, 10., 10.]   # Order-of-magnitude initial guesses
+c_in = [1.0, 1.0, 1.0, 1.0]   # Order-of-magnitude initial guesses
 
 parser = argparse.ArgumentParser(description='Wilson Flow Matching.')
 parser.add_argument('c', metavar='constant', type=float, nargs=1, help='Enter the smearing constant that defines the extent of the smearing you are interested in.')
@@ -32,13 +32,14 @@ c = argdict['c'].pop()
 vol = defaultdict(list)
 vol = argdict['volumes']
 
+g2       = defaultdict(dict)
+g2_err   = defaultdict(dict)
+
 for volume in vol:
   L = int(volume[:len(volume)/2])
   t = round(((c*L)**2/8)/(0.02))*0.02
   betal    = defaultdict(list)
   data     = defaultdict(list)
-  g2       = defaultdict(dict)
-  g2_err   = defaultdict(dict)
   tmparry  = []
   tmpbetal = []
 
@@ -61,17 +62,46 @@ for volume in vol:
   x = []
   y = []
   e = []
-  for b in sorted(betal[volume]):
-    x.append(float(b))
-    y.append(float(g2[(volume,b)]))
-    e.append(float(g2_err[(volume,b)]))
-  ax = np.array(x)
-  ay = np.array(y)
-  ae = np.array(e)
-  coeff, success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
-  plt.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', label=volume)
-  plt.plot(ax, fitfunc(coeff,ax))
-plt.legend()
-plt.savefig("plots/wflow.png", format='png')
+  #for b in sorted(betal[volume]):
+    #x.append(float(b))
+    #y.append(float(g2[(volume,b)]))
+    #e.append(float(g2_err[(volume,b)]))
+  #ax = np.array(x)
+  #ay = np.array(y)
+  #ae = np.array(e)
+  #coeff, success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
+  #plt.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', label=volume)
+  #plt.plot(ax, fitfunc(coeff,ax))
+#plt.legend()
+#plt.savefig("plots/wflow.png", format='png')
 
 
+x = []
+y = []
+x.append(1.0/24**2)
+y.append((g2[('4848','6.0')]-g2[('2424','6.0')])/(2*np.log(2)))
+x.append(1.0/16**2)
+y.append((g2[('3232','6.0')]-g2[('1616','6.0')])/(2*np.log(2)))
+x.append(1.0/12**2)
+y.append((g2[('2424','6.0')]-g2[('1212','6.0')])/(2*np.log(2)))
+x.append(1.0/8**2)
+y.append((g2[('1616','6.0')]-g2[('88','6.0')])/(2*np.log(2)))
+
+ax = np.array(x)
+ay = np.array(y)
+plt.plot(ax, ay)
+plt.savefig('plots/six.png', format='png')
+
+#x = []
+#y = []
+#x.append(1.0/16**2)
+#y.append((g2[('3232','4.0')]-g2[('1616','4.0')])/(2*np.log(2)))
+#x.append(1.0/12**2)
+#y.append((g2[('2424','4.0')]-g2[('1212','4.0')])/(2*np.log(2)))
+#x.append(1.0/8**2)
+#y.append((g2[('1616','4.0')]-g2[('88','4.0')])/(2*np.log(2)))
+
+#ax = np.array(x)
+#ay = np.array(y)
+#plt.plot(ax, ay)
+#plt.savefig('plots/four.png', format='png')
