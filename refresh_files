@@ -1,125 +1,67 @@
 echo "Updating Wflow files" 
 echo "Volume:  6x6x6x6" 
-rsync ~/anna/Run_APBC12_66/Out/Wflow* 12flav_66/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/Wflow* 12flav_66/wflow/.
 echo "Volume:  8x8x8x8" 
-rsync ~/anna/Run_APBC12_88/Out/Wflow* 12flav_88/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/Wflow* 12flav_88/wflow/.
 echo "Volume:  12x12x12x12" 
-rsync ~/anna/Run_APBC12_1212/Out/Wflow* 12flav_1212/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/Wflow* 12flav_1212/wflow/.
 echo "Volume:  16x16x16x16" 
-rsync ~/anna/Run_APBC12_1616/Out/Wflow* 12flav_1616/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/Wflow* 12flav_1616/wflow/.
 echo "Volume:  24x24x24x24" 
-rsync ~/anna/Run_APBC12_2424/Out/Wflow* 12flav_2424/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/Wflow* 12flav_2424/wflow/.
 echo "Volume:  32x32x32x32" 
-rsync ~/anna/Run_APBC12_3232/Out/Wflow* 12flav_3232/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/Wflow* 12flav_3232/wflow/.
 echo "Volume:  48x48x48x48" 
-rsync ~/anna/Run_APBC12_4848/Out/Wflow* 12flav_4848/wflow/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/Wflow* 12flav_4848/wflow/.
 echo
 
 echo "Updating Scheme 7 WMCRG files" 
 echo "Volume:  6x6x6x6" 
-rsync ~/anna/Run_APBC12_66/Out/WMCRG7* 12flav_66/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG7* 12flav_66/sch7/.
 echo "Volume:  8x8x8x8" 
-rsync ~/anna/Run_APBC12_88/Out/WMCRG7* 12flav_88/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG7* 12flav_88/sch7/.
 echo "Volume:  12x12x12x12" 
-rsync ~/anna/Run_APBC12_1212/Out/WMCRG7* 12flav_1212/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG7* 12flav_1212/sch7/.
 echo "Volume:  16x16x16x16" 
-rsync ~/anna/Run_APBC12_1616/Out/WMCRG7* 12flav_1616/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG7* 12flav_1616/sch7/.
 echo "Volume:  24x24x24x24" 
-rsync ~/anna/Run_APBC12_2424/Out/WMCRG7* 12flav_2424/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG7* 12flav_2424/sch7/.
 echo "Volume:  32x32x32x32" 
-rsync ~/anna/Run_APBC12_3232/Out/WMCRG7* 12flav_3232/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG7* 12flav_3232/sch7/.
 echo "Volume:  48x48x48x48" 
-rsync ~/anna/Run_APBC12_4848/Out/WMCRG7* 12flav_4848/sch7/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG7* 12flav_4848/sch7/.
 echo
 
 echo "Updating Scheme 9 WMCRG files" 
 echo "Volume:  6x6x6x6" 
-rsync ~/anna/Run_APBC12_66/Out/WMCRG9* 12flav_66/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG9* 12flav_66/sch9/.
 echo "Volume:  8x8x8x8" 
-rsync ~/anna/Run_APBC12_88/Out/WMCRG9* 12flav_88/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG9* 12flav_88/sch9/.
 echo "Volume:  12x12x12x12" 
-rsync ~/anna/Run_APBC12_1212/Out/WMCRG9* 12flav_1212/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG9* 12flav_1212/sch9/.
 echo "Volume:  16x16x16x16" 
-rsync ~/anna/Run_APBC12_1616/Out/WMCRG9* 12flav_1616/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG9* 12flav_1616/sch9/.
 echo "Volume:  24x24x24x24" 
-rsync ~/anna/Run_APBC12_2424/Out/WMCRG9* 12flav_2424/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG9* 12flav_2424/sch9/.
 echo "Volume:  32x32x32x32" 
-rsync ~/anna/Run_APBC12_3232/Out/WMCRG9* 12flav_3232/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG9* 12flav_3232/sch9/.
 echo "Volume:  48x48x48x48" 
-rsync ~/anna/Run_APBC12_4848/Out/WMCRG9* 12flav_4848/sch9/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG9* 12flav_4848/sch9/.
 echo
 
 echo "Updating Scheme 11 WMCRG files" 
 echo "Volume:  6x6x6x6" 
-rsync ~/anna/Run_APBC12_66/Out/WMCRG11* 12flav_66/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG11* 12flav_66/sch11/.
 echo "Volume:  8x8x8x8" 
-rsync ~/anna/Run_APBC12_88/Out/WMCRG11* 12flav_88/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG11* 12flav_88/sch11/.
 echo "Volume:  12x12x12x12" 
-rsync ~/anna/Run_APBC12_1212/Out/WMCRG11* 12flav_1212/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG11* 12flav_1212/sch11/.
 echo "Volume:  16x16x16x16" 
-rsync ~/anna/Run_APBC12_1616/Out/WMCRG11* 12flav_1616/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG11* 12flav_1616/sch11/.
 echo "Volume:  24x24x24x24" 
-rsync ~/anna/Run_APBC12_2424/Out/WMCRG11* 12flav_2424/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG11* 12flav_2424/sch11/.
 echo "Volume:  32x32x32x32" 
-rsync ~/anna/Run_APBC12_3232/Out/WMCRG11* 12flav_3232/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG11* 12flav_3232/sch11/.
 echo "Volume:  48x48x48x48" 
-rsync ~/anna/Run_APBC12_4848/Out/WMCRG11* 12flav_4848/sch11/.
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG11* 12flav_4848/sch11/.
 echo
-
-echo "Thermalization Cut"
-echo "Volume:  6x6x6x6" 
-for i in {2..100}
-do
-rm -f 12flav_66/wflow/*.$i
-rm -f 12flav_66/sch7/*.$i
-rm -f 12flav_66/sch9/*.$i
-rm -f 12flav_66/sch11/*.$i
-done
-echo "Volume:  8x8x8x8" 
-for i in {2..100}
-do
-rm -f 12flav_88/wflow/*.$i
-rm -f 12flav_88/sch7/*.$i
-rm -f 12flav_88/sch9/*.$i
-rm -f 12flav_88/sch11/*.$i
-done
-echo "Volume:  12x12x12x12" 
-for i in {2..100}
-do
-rm -f 12flav_1212/wflow/*.$i
-rm -f 12flav_1212/sch7/*.$i
-rm -f 12flav_1212/sch9/*.$i
-rm -f 12flav_1212/sch11/*.$i
-done
-echo "Volume:  16x16x16x16" 
-for i in {2..100}
-do
-rm -f 12flav_1616/wflow/*.$i
-rm -f 12flav_1616/sch7/*.$i
-rm -f 12flav_1616/sch9/*.$i
-rm -f 12flav_1616/sch11/*.$i
-done
-echo "Volume:  24x24x24x24" 
-for i in {2..100}
-do
-rm -f 12flav_2424/wflow/*.$i
-rm -f 12flav_2424/sch7/*.$i
-rm -f 12flav_2424/sch9/*.$i
-rm -f 12flav_2424/sch11/*.$i
-done
-echo "Volume:  32x32x32x32" 
-for i in {2..100}
-do
-rm -f 12flav_3232/wflow/*.$i
-rm -f 12flav_3232/sch7/*.$i
-rm -f 12flav_3232/sch9/*.$i
-rm -f 12flav_3232/sch11/*.$i
-done
-echo "Volume:  48x48x48x48" 
-for i in {2..100}
-do
-rm -f 12flav_4848/wflow/*.$i
-rm -f 12flav_4848/sch7/*.$i
-rm -f 12flav_4848/sch9/*.$i
-rm -f 12flav_4848/sch11/*.$i
-done

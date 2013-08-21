@@ -16,12 +16,16 @@ from collections import defaultdict
 from scipy import optimize
 
 s  = 2
-dc = 0
+dc = -0.03
+error_guess = math.sqrt(0.018**2+0.018**2)
 
 #fitfunc = lambda c, x: -1 / (c[0] + c[1]*(12.0/x) + c[2]*(12.0/x)**2 + c[3]*(12.0/x)**3 - x/12.0)
 fitfunc = lambda c, x: c[3] + c[2]*x + c[1]*x**2 + c[0]*x**3
 errfunc = lambda c, x, y, err: (fitfunc(c, x) - y) / err
 c_in = [1.0, 1.0, 1.0, 1.0]   # Order-of-magnitude initial guesses
+fitfunc2 = lambda c, x: c[2] + c[1]*x + c[0]*x**2
+errfunc2 = lambda c, x, y, err: (fitfunc2(c, x) - y) / err
+c2_in = [1.0, 1.0, 1.0]   # Order-of-magnitude initial guesses
 
 parser = argparse.ArgumentParser(description='Wilson Flow Matching.')
 parser.add_argument('c', metavar='constant', type=float, nargs=1, help='Enter the smearing constant that defines the extent of the smearing you are interested in.')
@@ -40,6 +44,8 @@ coeff    = defaultdict(dict)
 pcolor   = {'88': 'b', '1212': 'g', '1616': 'r', '2424': 'c', '3232': 'm', '4848': 'y'}
 
 fig1=plt.figure()
+figleft=plt.figure()
+figcenter=plt.figure()
 for volume in vol:
   L = int(volume[:len(volume)/2])
   t = round(((c*L)**2/8)/(0.02))*0.02
@@ -72,16 +78,35 @@ for volume in vol:
     x.append(float(b))
     y.append(float(g2[(volume,b)]))
     e.append(float(g2_err[(volume,b)]))
+  print e
   ax = np.array(x)
   ay = np.array(y)
   ae = np.array(e)
   splt1 = fig1.add_subplot(111)
+  spltleft = figleft.add_subplot(111)
+  spltcenter = figcenter.add_subplot(111)
   splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[volume], label=volume)
+  spltleft.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[volume], label=volume)
+  spltcenter.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[volume], label=volume)
+  if volume == '3232':
+    coeff[volume], success = optimize.leastsq(errfunc2, c2_in[:], args=(ax, ay, ae))
+    splt1.plot(ax, fitfunc2(coeff[volume],ax))
+    spltleft.plot(ax, fitfunc2(coeff[volume],ax))
+    spltcenter.plot(ax, fitfunc2(coeff[volume],ax))
   if ((volume != '4848')and(volume != '3232')):
     coeff[volume], success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
     splt1.plot(ax, fitfunc(coeff[volume],ax))
-splt1.legend()
+    spltleft.plot(ax, fitfunc(coeff[volume],ax))
+    spltcenter.plot(ax, fitfunc(coeff[volume],ax))
+splt1.legend(loc=3)
+spltleft.legend()
+spltcenter.set_xlim(5,7)
+spltcenter.set_ylim(2.5,8)
+spltleft.set_xlim(3.5,5.5)
+spltleft.set_ylim(4.5,12)
 fig1.savefig("plots/wflow.png", format='png')
+figcenter.savefig("plots/center.png", format='png')
+figleft.savefig("plots/left.png", format='png')
 
 g0_3232_s2 = []
 if (('88' in vol) and ('1616' in vol) and ('3232' in vol)):
@@ -208,36 +233,46 @@ print "plot 3232 s=2"
 for g0 in g0_3232_s2:
   x = []
   y = []
+  e = []
   x.append(1.0/16**2)
   y.append(dg2[('2', '1616',g0)])
+  e.append(error_guess)
   x.append(1.0/12**2)
   y.append(dg2[('2', '1212',g0)])
+  e.append(error_guess)
   x.append(1.0/8**2)
   y.append(dg2[('2', '88',g0)])
+  e.append(error_guess)
 
   ax = np.array(x)
   ay = np.array(y)
+  ae = np.array(e)
   fig2 = plt.figure()
   splt2 = fig2.add_subplot(111)
-  splt2.plot(ax, ay)
+  splt2.errorbar(ax, ay, ae)
   fig2.savefig('plots/3232_'+ str(g0)+'.png', format='png')
 
 print "plot four.png s=2"
 for g0 in g0_4848_s2:
   x = []
   y = []
+  e = []
   x.append(1.0/24**2)
   y.append(dg2[('2', '2424',g0)])
+  e.append(error_guess)
   #x.append(1.0/16**2)
   #y.append(dg2[('2', '1616',g0)])
   x.append(1.0/12**2)
   y.append(dg2[('2', '1212',g0)])
+  e.append(error_guess)
   x.append(1.0/8**2)
   y.append(dg2[('2', '88',g0)])
+  e.append(error_guess)
 
   ax = np.array(x)
   ay = np.array(y)
+  ae = np.array(e)
   fig3 = plt.figure()
   splt3 = fig3.add_subplot(111)
-  splt3.plot(ax, ay)
+  splt3.errorbar(ax, ay, ae)
   fig3.savefig('plots/4848_'+ str(g0)+'.png', format='png')
