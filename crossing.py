@@ -20,9 +20,6 @@ from scipy import optimize
 fitfunc = lambda c, x: c[3] + c[2]*x + c[1]*x**2 + c[0]*x**3
 errfunc = lambda c, x, y, err: (fitfunc(c, x) - y) / err
 c_in = [1.0, 1.0, 1.0, 1.0]   # Order-of-magnitude initial guesses
-fitfunc2 = lambda c, x: c[2] + c[1]*x + c[0]*x**2
-errfunc2 = lambda c, x, y, err: (fitfunc2(c, x) - y) / err
-c2_in = [1.0, 1.0, 1.0]   # Order-of-magnitude initial guesses
 
 parser = argparse.ArgumentParser(description='Wilson Flow Crossing.')
 parser.add_argument('s', metavar='scale factor', type=float, nargs=1, help='Enter the scale factor between the two volumes.')
@@ -53,90 +50,48 @@ coeff    = defaultdict(dict)
 pcolor   = {'66': 'y', '88': 'b', '1212': 'g', '1616': 'r', '2424': 'c', '3232': 'm', '4848': 'y'}
 
 fig1=plt.figure()
+for vol in (svol,lvol):
+  L = int(vol[:len(vol)/2])
+  t = (c*L)**2/8 + t0
+  data     = defaultdict(list)
+  tmparry  = []
+  tmpbetal = []
 
-L = int(svol[:len(svol)/2])
-t = (c*L)**2/8 + t0
-data     = defaultdict(list)
-tmparry  = []
-tmpbetal = []
+  filelist = glob.glob('12flav_'+vol+'/wflow/dat/*')
+  for filename in filelist:
+    tmparry = re.split('_', filename)
+    beta = tmparry[3]
+    tmpbetal.append(beta)
+    frame = pd.read_table(filename, sep=' ')
+    f = scipy.interpolate.interp1d(frame['t'],frame['t^2E'])
+    data[beta].append(f(t))
 
-filelist = glob.glob('12flav_'+svol+'/wflow/dat/*')
-for filename in filelist:
-  tmparry = re.split('_', filename)
-  beta = tmparry[3]
-  tmpbetal.append(beta)
-  frame = pd.read_table(filename, sep=' ')
-  f = scipy.interpolate.interp1d(frame['t'],frame['t^2E'])
-  data[beta].append(f(t))
+  betal[vol]=(set(tmpbetal))
+  print vol
+  print betal[vol]
+  for b in betal[vol]:
+    t2E = np.mean(data[b])
+    t2E_err = scipy.stats.sem(data[b])*math.sqrt(10) #temporary hack
+    g2[(vol,b)] = (128*math.pi**2*t2E)/(3*(3**2-1)*(1+dc))
+    g2_err[(vol,b)] = (128*math.pi**2*t2E_err)/(3*(3**2-1)*(1+dc))
 
-betal[svol]=(set(tmpbetal))
-print svol
-print betal[svol]
-for b in betal[svol]:
-  t2E = np.mean(data[b])
-  t2E_err = scipy.stats.sem(data[b])*math.sqrt(10) #temporary hack
-  g2[(svol,b)] = (128*math.pi**2*t2E)/(3*(3**2-1)*(1+dc))
-  g2_err[(svol,b)] = (128*math.pi**2*t2E_err)/(3*(3**2-1)*(1+dc))
+    x = []
+    y = []
+    e = []
+  for b in sorted(betal[vol]):
+    x.append(float(b))
+    y.append(float(g2[(vol,b)]))
+    e.append(float(g2_err[(vol,b)]))
+  ax = np.array(x)
+  ay = np.array(y)
+  ae = np.array(e)
+  splt1 = fig1.add_subplot(111)
+  splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[vol], label=vol)
+  coeff[vol], success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
+  splt1.plot(ax, fitfunc(coeff[vol],ax))
+  splt1.legend(loc=3)
 
-x = []
-y = []
-e = []
-for b in sorted(betal[svol]):
-  x.append(float(b))
-  y.append(float(g2[(svol,b)]))
-  e.append(float(g2_err[(svol,b)]))
-ax = np.array(x)
-ay = np.array(y)
-ae = np.array(e)
-splt1 = fig1.add_subplot(111)
-splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[svol], label=svol)
-coeff[svol], success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
-splt1.plot(ax, fitfunc(coeff[svol],ax))
-splt1.legend(loc=3)
-
-# - - - - - - - - - - - - - - - - - - -
-
-L = int(lvol[:len(lvol)/2])
-t = (c*L)**2/8 + t0
-data     = defaultdict(list)
-tmparry  = []
-tmpbetal = []
-
-filelist = glob.glob('12flav_'+lvol+'/wflow/dat/*')
-for filename in filelist:
-  tmparry = re.split('_', filename)
-  beta = tmparry[3]
-  tmpbetal.append(beta)
-  frame = pd.read_table(filename, sep=' ')
-  f = scipy.interpolate.interp1d(frame['t'],frame['t^2E'])
-  data[beta].append(f(t))
-
-betal[lvol]=(set(tmpbetal))
-print lvol
-print betal[lvol]
-for b in betal[lvol]:
-  t2E = np.mean(data[b])
-  t2E_err = scipy.stats.sem(data[b])*math.sqrt(10) #temporary hack
-  g2[(lvol,b)] = (128*math.pi**2*t2E)/(3*(3**2-1)*(1+dc))
-  g2_err[(lvol,b)] = (128*math.pi**2*t2E_err)/(3*(3**2-1)*(1+dc))
-
-x = []
-y = []
-e = []
-for b in sorted(betal[lvol]):
-  x.append(float(b))
-  y.append(float(g2[(lvol,b)]))
-  e.append(float(g2_err[(lvol,b)]))
-ax = np.array(x)
-ay = np.array(y)
-ae = np.array(e)
-splt1 = fig1.add_subplot(111)
-splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[lvol], label=lvol)
-coeff[lvol], success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
-splt1.plot(ax, fitfunc(coeff[lvol],ax))
-splt1.legend(loc=3)
-
-# - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - -- - - -
 
 roots = np.roots(coeff[lvol]-coeff[svol])
 possible = []
@@ -153,4 +108,4 @@ if len(possible) == 1:
 else:
   print "Did not find one crossing"
 
-fig1.savefig("plots/"+str(s)+str(c)+"_"+str(t0)+"_"+svol+"-"+lvol+"_wflow.png", format='png')
+fig1.savefig("plots/"+str(s)+"_"+str(c)+"_"+str(t0)+"_"+svol+"-"+lvol+"_wflow.png", format='png')
