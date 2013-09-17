@@ -12,10 +12,10 @@ import scipy
 import glob
 import re
 import argparse
-from collections import defaultdict
-from scipy import optimize
 import time
 import datetime
+from collections import defaultdict
+from scipy import optimize
 
 #fitfunc = lambda c, x: -1 / (c[0] + c[1]*(12.0/x) + c[2]*(12.0/x)**2 + c[3]*(12.0/x)**3 - x/12.0)
 fitfunc = lambda c, x: c[3] + c[2]*x + c[1]*x**2 + c[0]*x**3
@@ -50,7 +50,7 @@ g2       = defaultdict(dict)
 g2_err   = defaultdict(dict)
 dg2      = defaultdict(dict)
 coeff    = defaultdict(dict)
-pcolor   = {'66': 'y', '88': 'b', '1212': 'g', '1616': 'r', '2424': 'c', '3232': 'm', '4848': 'y'}
+pcolor   = {'66': 'y', '88': 'b', '1212': 'g', '1616': 'r','1818': 'y', '2424': 'c', '3232': 'm', '4848': 'y'}
 
 fig1=plt.figure()
 for vol in (svol,lvol):
@@ -114,7 +114,8 @@ if len(possible) == 1:
   x = float(1)/float((int(svol[:len(svol)/2]))**2)
   crossing = np.polyval(coeff[lvol],beta_tmp).real
 else:
-  print "Did not find one crossing"
+  print "Did not find one crossing:"
+  print possible
   sys.exit()
 
 # - - - - - - - - - - - - - - - - - -
@@ -147,7 +148,8 @@ if len(possible) == 1:
   x = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
-  print "Did not find one crossing between the small volume plus errors and the large volume plus errors"
+  print "Did not find one crossing between the small volume plus errors and the large volume plus errors:"
+  print possible
 
 
 # small - large -
@@ -176,7 +178,8 @@ if len(possible) == 1:
   x = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
-  print "Did not find one crossing between the small volume minus errors and the large volume minus errors"
+  print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
+  print possible
 
 # small - large +
 for vol in (svol,lvol):
@@ -207,7 +210,8 @@ if len(possible) == 1:
   x = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
-  print "Did not find one crossing between the small volume minus errors and the large volume minus errors"
+  print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
+  print possible
 
 # small + large -
 for vol in (svol,lvol):
@@ -238,7 +242,8 @@ if len(possible) == 1:
   x = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
-  print "Did not find one crossing between the small volume minus errors and the large volume minus errors"
+  print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
+  print possible
 
 err_plus  = max(err_crossing)
 err_minus = min(err_crossing)

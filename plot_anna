@@ -1,0 +1,42 @@
+set term png
+
+set output '2_0.3.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/2_0.3_0.0' u 1:3:4:5 w yerrorbars, 'plots/2_0.3_0.01' u 1:3:4:5 w yerrorbars, 'plots/2_0.3_0.05' u 1:3:4:5 w yerrorbars, 'plots/2_0.3_0.08' u 1:3:4:5 w yerrorbars, 'plots/2_0.3_0.1' u 1:3:4:5 w yerrorbars
+
+set output '2_0.25.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/2_0.25_0.0' u 1:3:4:5 w yerrorbars, 'plots/2_0.25_0.01' u 1:3:4:5 w yerrorbars, 'plots/2_0.25_0.05' u 1:3:4:5 w yerrorbars, 'plots/2_0.25_0.08' u 1:3:4:5 w yerrorbars, 'plots/2_0.25_0.1' u 1:3:4:5 w yerrorbars
+
+set output '1.5_0.3.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/1.5_0.3_0.0' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.3_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.3_0.02' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.3_0.05' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.3_0.08' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.3_0.1' u 1:3:4:5 w yerrorbars
+
+set output '1.5_0.25.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/1.5_0.25_0.0' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.25_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.25_0.02' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.25_0.05' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.25_0.08' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.25_0.1' u 1:3:4:5 w yerrorbars
+
+set output '1.3_0.3.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/1.3_0.3_0.0' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.02' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.05' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.08' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.1' u 1:3:4:5 w yerrorbars
+
+set output '1.3_0.25.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/1.3_0.25_0.0' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.25_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.02' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.25_0.05' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.25_0.08' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.25_0.1' u 1:3:4:5 w yerrorbars
+
+
+set output '0.25.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/2_0.25_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.25_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.25_0.01' u 1:3:4:5 w yerrorbars
+
+set output '0.3.png'
+set xrange[0:0.016]
+set yrange[0:15]
+plot 'plots/2_0.3_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.5_0.3_0.01' u 1:3:4:5 w yerrorbars, 'plots/1.3_0.3_0.01' u 1:3:4:5 w yerrorbars

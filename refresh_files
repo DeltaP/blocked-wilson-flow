@@ -7,6 +7,8 @@ echo "Volume:  12x12x12x12"
 rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/Wflow* 12flav_1212/wflow/.
 echo "Volume:  16x16x16x16" 
 rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/Wflow* 12flav_1616/wflow/.
+echo "Volume:  18x18x18x18" 
+rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1818/Out/Wflow* 12flav_1818/wflow/.
 echo "Volume:  24x24x24x24" 
 rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/Wflow* 12flav_2424/wflow/.
 echo "Volume:  32x32x32x32" 
