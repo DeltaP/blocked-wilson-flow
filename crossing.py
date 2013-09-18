@@ -97,7 +97,7 @@ for vol in (svol,lvol):
   t_finish = time.time()
   elapsed  = t_finish - t_start
   print "Took %s to parse\n.\t.\t.\t." % str(datetime.timedelta(seconds=elapsed))
-fig1.savefig("plots/"+str(s)+"_"+str(c)+"_"+str(t0)+"_"+svol+"-"+lvol+"_wflow.png", format='png')
+fig1.savefig("plots/crossing/wflow/"+str(s)+"_"+str(c)+"_"+str(t0)+"_"+svol+"-"+lvol+"_wflow.png", format='png')
 
 # - - - - - - - - - - - - - - - - - -
 
@@ -111,12 +111,12 @@ for i in roots:
 
 if len(possible) == 1:
   beta_tmp = possible.pop()
-  x = float(1)/float((int(svol[:len(svol)/2]))**2)
+  il = float(1)/float((int(svol[:len(svol)/2]))**2)
   crossing = np.polyval(coeff[lvol],beta_tmp).real
 else:
   print "Did not find one crossing:"
   print possible
-  sys.exit()
+  #sys.exit()
 
 # - - - - - - - - - - - - - - - - - -
 # find 4 corners of error region
@@ -145,7 +145,7 @@ for i in roots:
     possible.append(i) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
-  x = float(1)/float((int(svol[:len(svol)/2]))**2)
+  il = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
   print "Did not find one crossing between the small volume plus errors and the large volume plus errors:"
@@ -175,7 +175,7 @@ for i in roots:
     possible.append(i) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
-  x = float(1)/float((int(svol[:len(svol)/2]))**2)
+  il = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
   print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
@@ -207,10 +207,10 @@ for i in roots:
     possible.append(i) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
-  x = float(1)/float((int(svol[:len(svol)/2]))**2)
+  il = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
-  print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
+  print "Did not find one crossing between the small volume minus errors and the large volume plus errors:"
   print possible
 
 # small + large -
@@ -239,13 +239,13 @@ for i in roots:
     possible.append(i) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
-  x = float(1)/float((int(svol[:len(svol)/2]))**2)
+  il = float(1)/float((int(svol[:len(svol)/2]))**2)
   err_crossing.append(np.polyval(coeff[lvol],beta_tmp).real)
 else:
-  print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
+  print "Did not find one crossing between the small volume plus errors and the large volume minus errors:"
   print possible
 
 err_plus  = max(err_crossing)
 err_minus = min(err_crossing)
 
-print x, beta_tmp.real, crossing, err_minus, err_plus
+print il, beta_tmp.real, crossing, err_minus, err_plus
