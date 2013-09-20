@@ -15,11 +15,22 @@ import argparse
 import time
 import datetime
 from collections import defaultdict
+from scipy.optimize import curve_fit
 from scipy import optimize
 
+def fitFunc2(x,c0,c1,c2,c3):
+  return c0 - c1*x - c2*x**2 - c3*x**3
+
+def fitFunc(x,c0,c1,c2,c3):
+  return 1/x - c0 - c1*x - c2*x**2 - c3*(x)**3
+
+def invfitFunc(x,c0,c1,c2,c3):
+  return 1/(1/x - c0 - c1*x - c2*x**2 - c3*x**3)
+
 #fitfunc = lambda c, x: -1 / (c[0] + c[1]*(12.0/x) + c[2]*(12.0/x)**2 + c[3]*(12.0/x)**3 - x/12.0)
-fitfunc = lambda c, x: c[3] + c[2]*x + c[1]*x**2 + c[0]*x**3
+fitfunc = lambda c, x: -c[3] + -c[2]*(x/12) + -c[1]*(x/12)**2 + -c[0]*(x/12)**3 + 1/(12*x)
 errfunc = lambda c, x, y, err: (fitfunc(c, x) - y) / err
+invfitfunc = lambda c, x: 1/(-c[3] + -c[2]*(x/12) + -c[1]*(x/12)**2 + -c[0]*(x/12)**3 + 1/(12*x))
 c_in = [1.0, 1.0, 1.0, 1.0]   # Order-of-magnitude initial guesses
 
 parser = argparse.ArgumentParser(description='Wilson Flow Crossing.')
@@ -89,11 +100,21 @@ for vol in (svol,lvol):
   ax = np.array(x)
   ay = np.array(y)
   ae = np.array(e)
+  ix = 12.0/ax
+  iy = 1.0/ay
+  ie = 1.0/ae
   splt1 = fig1.add_subplot(111)
   splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[vol], label=vol)
-  coeff[vol], success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
-  splt1.plot(ax, fitfunc(coeff[vol],ax))
+  #coeff[vol], success = optimize.leastsq(errfunc, c_in[:], args=(ix, iy, ie))
+  fitParams, fitCovariances = curve_fit(fitFunc, ix, iy, sigma=ie)
+  #splt1.plot(ax, invfitfunc(coeff[vol],ix))
   splt1.legend(loc=3)
+  print fitParams
+  print fitCovariances
+  sigma = [math.sqrt(fitCovariances[0,0]), math.sqrt(fitCovariances[1,1]), math.sqrt(fitCovariances[2,2]), math.sqrt(fitCovariances[3,3])]
+  plt.plot(ax, invfitFunc(ix, fitParams[0], fitParams[1], fitParams[2], fitParams[3]),\
+      ax, invfitFunc(ix, fitParams[0]+math.copysign(sigma[0],fitParams[0]), fitParams[1]+math.copysign(sigma[1],fitParams[1]), fitParams[2]+math.copysign(sigma[2],fitParams[2]), fitParams[3]+math.copysign(sigma[3],fitParams[3])),\
+      ax, invfitFunc(ix, fitParams[0]-math.copysign(sigma[0],fitParams[0]), fitParams[1]-math.copysign(sigma[1],fitParams[1]), fitParams[2]-math.copysign(sigma[2],fitParams[2]), fitParams[3]-math.copysign(sigma[3],fitParams[3])))
   t_finish = time.time()
   elapsed  = t_finish - t_start
   print "Took %s to parse\n.\t.\t.\t." % str(datetime.timedelta(seconds=elapsed))
