@@ -18,9 +18,6 @@ from collections import defaultdict
 from scipy.optimize import curve_fit
 from scipy import optimize
 
-def fitFunc2(x,c0,c1,c2,c3):
-  return c0 - c1*x - c2*x**2 - c3*x**3
-
 def fitFunc(x,c0,c1,c2,c3):
   return 1/x - c0 - c1*x - c2*x**2 - c3*(x)**3
 
@@ -97,24 +94,37 @@ for vol in (svol,lvol):
     x.append(float(b))
     y.append(float(g2[(vol,b)]))
     e.append(float(g2_err[(vol,b)]))
+  index = np.arange(0,len(x),1)
   ax = np.array(x)
   ay = np.array(y)
   ae = np.array(e)
   ix = 12.0/ax
   iy = 1.0/ay
-  ie = 1.0/ae
+  ie = ae*iy
   splt1 = fig1.add_subplot(111)
   splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[vol], label=vol)
-  #coeff[vol], success = optimize.leastsq(errfunc, c_in[:], args=(ix, iy, ie))
   fitParams, fitCovariances = curve_fit(fitFunc, ix, iy, sigma=ie)
-  #splt1.plot(ax, invfitfunc(coeff[vol],ix))
+  coeff[vol] = fitParams
   splt1.legend(loc=3)
   print fitParams
   print fitCovariances
-  sigma = [math.sqrt(fitCovariances[0,0]), math.sqrt(fitCovariances[1,1]), math.sqrt(fitCovariances[2,2]), math.sqrt(fitCovariances[3,3])]
-  plt.plot(ax, invfitFunc(ix, fitParams[0], fitParams[1], fitParams[2], fitParams[3]),\
-      ax, invfitFunc(ix, fitParams[0]+math.copysign(sigma[0],fitParams[0]), fitParams[1]+math.copysign(sigma[1],fitParams[1]), fitParams[2]+math.copysign(sigma[2],fitParams[2]), fitParams[3]+math.copysign(sigma[3],fitParams[3])),\
-      ax, invfitFunc(ix, fitParams[0]-math.copysign(sigma[0],fitParams[0]), fitParams[1]-math.copysign(sigma[1],fitParams[1]), fitParams[2]-math.copysign(sigma[2],fitParams[2]), fitParams[3]-math.copysign(sigma[3],fitParams[3])))
+  yerr = []
+  for i in index:
+    xvec = np.array([1,ix[i],ix[i]**2,ix[i]**3])
+    yerr.append(math.sqrt(np.dot(np.dot(xvec,fitCovariances),xvec)))
+  ayerr = np.array(yerr)/iy
+  yfit = invfitFunc(ix, fitParams[0], fitParams[1], fitParams[2], fitParams[3])
+  yerr2p = []
+  yerr2m = []
+  for i in index:
+    yerr2p.append(math.fabs(yfit[i] - invfitFunc(ix[i], fitParams[0]+yerr[i], fitParams[1], fitParams[2], fitParams[3])))
+    yerr2m.append(math.fabs(yfit[i] - invfitFunc(ix[i], fitParams[0]-yerr[i], fitParams[1], fitParams[2], fitParams[3])))
+  ayerr2p=np.array(yerr2p)
+  ayerr2m=np.array(yerr2m)
+  plt.plot(ax, yfit,color=pcolor[vol])
+  plt.fill_between(ax, yfit-ayerr,yfit+ayerr,color='r')
+  plt.fill_between(ax, yfit-ayerr2m,yfit+ayerr2p,color='r')
+
   t_finish = time.time()
   elapsed  = t_finish - t_start
   print "Took %s to parse\n.\t.\t.\t." % str(datetime.timedelta(seconds=elapsed))
