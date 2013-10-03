@@ -76,6 +76,8 @@ for vol in (svol,lvol):
   for filename in filelist:
     tmparry = re.split('_', filename)
     beta = tmparry[3]
+    if float(beta) < 4.0:    #temporary for test
+      continue               #temporary for test
     tmpbetal.append(beta)
     frame = pd.read_table(filename, sep=' ')
     f = scipy.interpolate.interp1d(frame['t'],frame['E'])
@@ -117,8 +119,6 @@ for vol in (svol,lvol):
   fitParams, fitCovariances = curve_fit(fitFunc, ix, iy, sigma=ie)
   coeff[vol] = fitParams
   coeff[vol] = np.insert(coeff[vol],0,1)
-  print fitParams
-  print fitCovariances
   
   yerr = []
   for i in index:
@@ -130,11 +130,7 @@ for vol in (svol,lvol):
   yerr2m = []
   inv_yfit = invfitFunc(ix, fitParams[0], fitParams[1], fitParams[2], fitParams[3])
   inv_yerr = ay * ayerr[vol] / iy
-  #for i in index:
-    #yerr2p.append(invfitFunc(ix[i], fitParams[0]+yerr[i], fitParams[1], fitParams[2],fitParams[3]))
-    #yerr2m.append(invfitFunc(ix[i], fitParams[0]-yerr[i], fitParams[1], fitParams[2],fitParams[3]))
-  #ayerr2p = np.array(yerr2p)
-  #ayerr2m = np.array(yerr2m)
+
   xfit[vol] = ix
   yfit[vol] = fitFunc(ix, fitParams[0], fitParams[1], fitParams[2], fitParams[3])
   splt1.plot(ix, yfit[vol],color=pcolor[vol])
@@ -152,12 +148,12 @@ fig2.savefig("plots/crossing/wflow/"+str(s)+"_"+str(c)+"_"+str(t0)+"_"+svol+"-"+
 
 roots = np.roots(coeff[lvol][::-1]-coeff[svol][::-1])
 possible = []
-print roots
 for i in roots:
-  if ((i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
+  im = i.imag
+  if ((im != 0) or (i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
     next
   else:
-    possible.append(i) 
+    possible.append(i.real) 
 
 if len(possible) == 1:
   crossing_x = possible.pop()
@@ -187,10 +183,11 @@ lcoeff = np.insert(lcoeff,0,1)
 roots = np.roots(scoeff[::-1]-lcoeff[::-1])
 possible = []
 for i in roots:
-  if ((i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
+  im = i.imag
+  if ((im != 0) or (i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
     next
   else:
-    possible.append(i) 
+    possible.append(i.real) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
   il = float(1)/float((int(svol[:len(svol)/2]))**2)
@@ -198,6 +195,9 @@ if len(possible) == 1:
 else:
   print "Did not find one crossing between the small volume plus errors and the large volume plus errors:"
   print possible
+  for p in possible:
+    print 1/(fitFunc2(p,coeff[svol][1],coeff[svol][2],coeff[svol][3],coeff[svol][4])/p)
+
 
 # small - large -
 fitParams, fitCovariances = curve_fit(fitFunc, xfit[svol], yfit[svol]-ayerr[svol])
@@ -211,10 +211,11 @@ lcoeff = np.insert(lcoeff,0,1)
 roots = np.roots(scoeff[::-1]-lcoeff[::-1])
 possible = []
 for i in roots:
-  if ((i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
+  im = i.imag
+  if ((im != 0) or (i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
     next
   else:
-    possible.append(i) 
+    possible.append(i.real) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
   il = float(1)/float((int(svol[:len(svol)/2]))**2)
@@ -222,6 +223,8 @@ if len(possible) == 1:
 else:
   print "Did not find one crossing between the small volume minus errors and the large volume minus errors:"
   print possible
+  for p in possible:
+    print 1/(fitFunc2(p,coeff[svol][1],coeff[svol][2],coeff[svol][3],coeff[svol][4])/p)
 
 # small - large +
 fitParams, fitCovariances = curve_fit(fitFunc, xfit[svol], yfit[svol]-ayerr[svol])
@@ -235,10 +238,11 @@ lcoeff = np.insert(lcoeff,0,1)
 roots = np.roots(scoeff[::-1]-lcoeff[::-1])
 possible = []
 for i in roots:
-  if ((i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
+  im = i.imag
+  if ((im != 0) or (i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
     next
   else:
-    possible.append(i) 
+    possible.append(i.real) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
   il = float(1)/float((int(svol[:len(svol)/2]))**2)
@@ -246,23 +250,26 @@ if len(possible) == 1:
 else:
   print "Did not find one crossing between the small volume minus errors and the large volume plus errors:"
   print possible
+  for p in possible:
+    print 1/(fitFunc2(p,coeff[svol][1],coeff[svol][2],coeff[svol][3],coeff[svol][4])/p)
 
 # small + large -
-fitParams, fitCovariances = curve_fit(fitFunc, xfit[svol], yfit[svol]-ayerr[svol])
+fitParams, fitCovariances = curve_fit(fitFunc, xfit[svol], yfit[svol]+ayerr[svol])
 scoeff = fitParams
 scoeff = np.insert(scoeff,0,1)
 
-fitParams, fitCovariances = curve_fit(fitFunc, xfit[lvol], yfit[lvol]+ayerr[lvol])
+fitParams, fitCovariances = curve_fit(fitFunc, xfit[lvol], yfit[lvol]-ayerr[lvol])
 lcoeff = fitParams
 lcoeff = np.insert(lcoeff,0,1)
 
 roots = np.roots(scoeff[::-1]-lcoeff[::-1])
 possible = []
 for i in roots:
-  if ((i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
+  im = i.imag
+  if ((im != 0) or (i < xfit[svol][0]) or (i < xfit[lvol][0]) or (i > xfit[svol][-1]) or (i > xfit[lvol][-1])):
     next
   else:
-    possible.append(i) 
+    possible.append(i.real) 
 if len(possible) == 1:
   beta_tmp = possible.pop()
   il = float(1)/float((int(svol[:len(svol)/2]))**2)
@@ -270,6 +277,8 @@ if len(possible) == 1:
 else:
   print "Did not find one crossing between the small volume plus errors and the large volume minus errors:"
   print possible
+  for p in possible:
+    print 1/(fitFunc2(p,coeff[svol][1],coeff[svol][2],coeff[svol][3],coeff[svol][4])/p)
 
 err_plus  = max(err_crossing)
 err_minus = min(err_crossing)
