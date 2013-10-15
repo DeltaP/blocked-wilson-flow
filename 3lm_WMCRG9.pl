@@ -26,7 +26,7 @@ my %Mass = (
 my $lv = substr($LargeV,0,2);
 my $bv = $lv/(2**$MaxBlock);
 my $bv2 = 2*$bv;
-my $Dir = "3lm_${bv}${bv2}_9";
+my $Dir = "3lm_${bv}${bv}_9";
 print "Saving to directory: $Dir\n";
 #add line to clear path
 
@@ -40,7 +40,7 @@ my @smearingt = ();
 
 print"Reading File:\n";                                                           # gets data
 foreach my $vol ($SmallV, $MediumV, $LargeV) {
-  my $base_name = "${NF}flav_${vol}/WMCRG9_";
+  my $base_name = "${NF}flav_${vol}/sch9/WMCRG9_";
   my @files = grep { /WMCRG9_(high|low|mix)_${vol}_.*_-0.25_$Mass{$vol}/ } glob( "$base_name*" );           # globs for file names
   foreach my $f (@files) {                                                        # loops through matching files
     print"... $f\n";
@@ -101,7 +101,6 @@ foreach my $t (@smearingt) {
         push(@y2, $avg{$LargeV}{$lv_beta}{$t}{$loop}{$block});
         push(@e2, $err{$LargeV}{$lv_beta}{$t}{$loop}{$block});
       }
-
       my $x1=pdl(@x1);                                                          # puts small volume data into piddle for fitting
       my $y1=pdl(@y1);
       my $e1=pdl(@e1);
@@ -461,4 +460,79 @@ foreach my $largeb (@{$Beta{$LargeV}}) {
     print FILE "\n"; 
     close FILE;
 }
-print"Extrapolating Delta Beta Averaging over Loops First Complete!\n";
+print"Interpolating Delta Beta Averaging over Loops First Complete!\n";
+
+print"Forcing Topt Values:\n";
+my %topt_low  = (
+  '4.0' => '0.124987400123536',
+  '4.5' => '0.132804708437847',
+  '5.0' => '0.134724386841505',
+  '5.5' => '0.132863887183872',
+  '6.0' => '0.128522086622257',
+  '6.5' => '0.12352621705332',
+  '7.0' => '0.118767911003859',
+  '7.5' => '0.116088733894923',
+  '8.0' => '0.0864995161616162',
+);
+
+my %topt      = (
+  '4.0' => '0.130543563707695',
+  '4.5' => '0.137716624266642',
+  '5.0' => '0.139041246267974',
+  '5.5' => '0.136673716296265',
+  '6.0' => '0.132071438907963',
+  '6.5' => '0.12683634614327',
+  '7.0' => '0.121918868185367',
+  '7.5' => '0.119046039418994',
+  '8.0' => '0.0886689925920303',
+);
+
+my %topt_high = (
+  '4.0' => '0.163442279582233',
+  '4.5' => '0.165481836728571',
+  '5.0' => '0.16313381360961',
+  '5.5' => '0.157938231576661',
+  '6.0' => '0.150895948441015',
+  '6.5' => '0.143274181940575',
+  '7.0' => '0.136570412558399',
+  '7.5' => '0.133219658491099',
+  '8.0' => '0.115148612129051',
+);
+
+foreach my $largeb (@{$Beta{$LargeV}}) {
+  print"... Beta:  $largeb\n";
+  my (@db_avg, @db_err, @plott) = ();
+  foreach my $t (@smearingt) {
+    my @db = ();
+    foreach my $loop (0,1,2,3) { #took out 8 link loop
+      if ($Full_delta_beta{$MaxBlock}{$largeb}{$loop}{$t} ne 'NaN') {
+        push(@db, $Full_delta_beta{$MaxBlock}{$largeb}{$loop}{$t});
+      }
+    }
+    if ((@db < 2)||(@db < 2)) {next;}
+    push(@db_avg,stat_mod::avg(@db));
+    push(@db_err,stat_mod::stdev(@db));
+    push(@plott,$t);
+  }
+  if (@db_avg < 2) {next;}
+  
+  my $x=pdl(@plott);
+  my $y=pdl(@db_avg);
+  my $e=pdl(@db_err);
+
+  (my $fit, my $coeffs)=fitpoly1d $x, $y, 4;
+  my $a=$coeffs->at(3);
+  my $b=$coeffs->at(2);
+  my $c=$coeffs->at(1);
+  my $d=$coeffs->at(0);
+  my $temp=pdl(($fit-$y)**2/$e**2);
+  my $chi=sum $temp;
+  $chi/=(@plott-4-1);
+  print"Chi^2 / dof:  $chi\n";
+
+  my $dbfit_low = $a*$topt_low{$largeb}**3+$b*$topt_low{$largeb}**2+$c*$topt_low{$largeb}+$d;
+  my $dbfit = $a*$topt{$largeb}**3+$b*$topt{$largeb}**2+$c*$topt{$largeb}+$d;
+  my $dbfit_high = $a*$topt_high{$largeb}**3+$b*$topt_high{$largeb}**2+$c*$topt_high{$largeb}+$d;
+  print "FORCE $largeb $dbfit $dbfit_low $dbfit_high\n";
+}
+print"Forcing Topt Values Complete!\n";
