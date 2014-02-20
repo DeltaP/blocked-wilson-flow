@@ -58,7 +58,7 @@ g2       = defaultdict(dict)
 g2_err   = defaultdict(dict)
 dg2      = defaultdict(dict)
 coeff    = defaultdict(dict)
-pcolor   = {'66': 'y', '88': 'b', '1212': 'g', '1616': 'r','1818': 'y', '2424': 'c', '3232': 'm', '4848': 'y'}
+pcolor   = {'66': 'y', '88': 'b', '1212': 'g', '1616': 'r','1818': 'y', '2424': 'c', '3232': 'm', '3636': 'y', '4848': 'y'}
 
 fig1=plt.figure(1)
 fig2=plt.figure(2)
@@ -76,8 +76,6 @@ for vol in (svol,lvol):
   for filename in filelist:
     tmparry = re.split('_', filename)
     beta = tmparry[3]
-    if float(beta) < 4.0:    #temporary for test
-      continue               #temporary for test
     tmpbetal.append(beta)
     frame = pd.read_table(filename, sep=' ')
     f = scipy.interpolate.interp1d(frame['t'],frame['E'])

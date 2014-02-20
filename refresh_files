@@ -1,69 +1,71 @@
 echo "Updating Wflow files" 
 echo "Volume:  6x6x6x6" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/Wflow* 12flav_66/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/Wflow* 12flav_66/wflow/.
 echo "Volume:  8x8x8x8" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/Wflow* 12flav_88/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/Wflow* 12flav_88/wflow/.
 echo "Volume:  12x12x12x12" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/Wflow* 12flav_1212/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/Wflow* 12flav_1212/wflow/.
 echo "Volume:  16x16x16x16" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/Wflow* 12flav_1616/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/Wflow* 12flav_1616/wflow/.
 echo "Volume:  18x18x18x18" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1818/Out/Wflow* 12flav_1818/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1818/Out/Wflow* 12flav_1818/wflow/.
 echo "Volume:  24x24x24x24" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/Wflow* 12flav_2424/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/Wflow* 12flav_2424/wflow/.
 echo "Volume:  32x32x32x32" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/Wflow* 12flav_3232/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/Wflow* 12flav_3232/wflow/.
+echo "Volume:  36x36x36x36" 
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3636/Out/Wflow* 12flav_3636/wflow/.
 echo "Volume:  48x48x48x48" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/Wflow* 12flav_4848/wflow/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/Wflow* 12flav_4848/wflow/.
 echo
 
 echo "Updating Scheme 7 WMCRG files" 
 echo "Volume:  6x6x6x6" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG7* 12flav_66/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG7* 12flav_66/sch7/.
 echo "Volume:  8x8x8x8" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG7* 12flav_88/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG7* 12flav_88/sch7/.
 echo "Volume:  12x12x12x12" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG7* 12flav_1212/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG7* 12flav_1212/sch7/.
 echo "Volume:  16x16x16x16" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG7* 12flav_1616/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG7* 12flav_1616/sch7/.
 echo "Volume:  24x24x24x24" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG7* 12flav_2424/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG7* 12flav_2424/sch7/.
 echo "Volume:  32x32x32x32" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG7* 12flav_3232/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG7* 12flav_3232/sch7/.
 echo "Volume:  48x48x48x48" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG7* 12flav_4848/sch7/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG7* 12flav_4848/sch7/.
 echo
 
 echo "Updating Scheme 9 WMCRG files" 
 echo "Volume:  6x6x6x6" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG9* 12flav_66/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG9* 12flav_66/sch9/.
 echo "Volume:  8x8x8x8" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG9* 12flav_88/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG9* 12flav_88/sch9/.
 echo "Volume:  12x12x12x12" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG9* 12flav_1212/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG9* 12flav_1212/sch9/.
 echo "Volume:  16x16x16x16" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG9* 12flav_1616/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG9* 12flav_1616/sch9/.
 echo "Volume:  24x24x24x24" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG9* 12flav_2424/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG9* 12flav_2424/sch9/.
 echo "Volume:  32x32x32x32" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG9* 12flav_3232/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG9* 12flav_3232/sch9/.
 echo "Volume:  48x48x48x48" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG9* 12flav_4848/sch9/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG9* 12flav_4848/sch9/.
 echo
 
 echo "Updating Scheme 11 WMCRG files" 
 echo "Volume:  6x6x6x6" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG11* 12flav_66/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_66/Out/WMCRG11* 12flav_66/sch11/.
 echo "Volume:  8x8x8x8" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG11* 12flav_88/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_88/Out/WMCRG11* 12flav_88/sch11/.
 echo "Volume:  12x12x12x12" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG11* 12flav_1212/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1212/Out/WMCRG11* 12flav_1212/sch11/.
 echo "Volume:  16x16x16x16" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG11* 12flav_1616/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_1616/Out/WMCRG11* 12flav_1616/sch11/.
 echo "Volume:  24x24x24x24" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG11* 12flav_2424/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_2424/Out/WMCRG11* 12flav_2424/sch11/.
 echo "Volume:  32x32x32x32" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG11* 12flav_3232/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_3232/Out/WMCRG11* 12flav_3232/sch11/.
 echo "Volume:  48x48x48x48" 
-rsync --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG11* 12flav_4848/sch11/.
+rsync -uvaz --exclude '*.[0-9][0-9]' --exclude '*.[0-9]' ~/anna/Run_APBC12_4848/Out/WMCRG11* 12flav_4848/sch11/.
 echo

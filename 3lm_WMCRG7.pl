@@ -225,17 +225,18 @@ foreach my $t (@smearingt) {
       my $x2=pdl(@x2);                                                          # puts small volume data into piddle for fitting
       my $y2=pdl(@y2);
       my $e2=pdl(@e2);
-      (my $fit2 , my $coeffs2)=fitpoly1d $x2, $y2, 4;                           # fits the small volumes
-      my $a2=$coeffs2->at(3);                                                   # extracts out the coefficients
-      my $b2=$coeffs2->at(2);
-      my $c2=$coeffs2->at(1);
-      my $d2=$coeffs2->at(0);
+      (my $fit2 , my $coeffs2)=fitpoly1d $x2, $y2, 5;                           # fits the small volumes
+      my $a2=$coeffs2->at(4);                                                   # extracts out the coefficients
+      my $b2=$coeffs2->at(3);                                                   # extracts out the coefficients
+      my $c2=$coeffs2->at(2);
+      my $d2=$coeffs2->at(1);
+      my $ee2=$coeffs2->at(0);
       my $temp2=pdl(($fit2-$y2)**2/$e2**2);
       my $chi2=sum $temp2;
-      $chi2/=(@x1-4-1);
+      $chi2/=(@x1-5-1);
       #print"CHI^2 large volume:  $chi2\n";
 
-      my $lv_fit_value = $a2*$largeb**3+$b2*$largeb**2+$c2*$largeb+$d2;
+      my $lv_fit_value = $a2*$largeb**4+$b2*$largeb**3+$c2*$largeb**2+$d2*$largeb+$ee2;
       my @roots=poly_roots(($a1),($b1),($c1),($d1-$lv_fit_value));              # solves for the difference between the fit and the large mass value
       my $beta_diff;
       my $hasroot = 0;
@@ -285,7 +286,7 @@ foreach my $t (@smearingt) {
         title => "Fit to Small Volume",
       );
       my $dataSet3 = Chart::Gnuplot::DataSet->new(                              # Create dataset object for the fit
-        func => "$a2*x**3+$b2*x**2+$c2*x+$d2",
+        func => "$a2*x**4+$b2*x**3+$c2*x**2+$d2*x+$ee2",
         title => "Fit to Large Volume",
       );
       $chart->plot2d($dataSet0, $dataSet1, $dataSet2, $dataSet3);                          # plots the chart
