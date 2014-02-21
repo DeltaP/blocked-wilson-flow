@@ -9,8 +9,6 @@ import glob
 import re
 import sys
 import argparse
-import time                         #included for timming
-import datetime                     #included for timming
 from collections import defaultdict
 
 numbers = re.compile(r'(\d+)')
@@ -49,4 +47,5 @@ print bins
 for binsize in (bins):
   print binsize
   binmeans = npdata[:(npdata.size // binsize) * binsize].reshape(-1, binsize).mean(axis=1) 
-  print binmeans.mean()
+  print type(binmeans)
+  jack_blk = 
