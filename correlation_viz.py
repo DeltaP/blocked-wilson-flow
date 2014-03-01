@@ -21,9 +21,18 @@ def numericalSort(value):           #sorting routine to sort files read in from 
     return parts
 
 #Just a parser takes volume and beta as arguments
-v     = '3232'
-#beta  = (4.0, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0, 6.5, 7.0, 8.0)
-beta  = (4.0, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0, 6.5, 7.0, 8.0)
+#v     = '1212'
+#beta  = np.arange(3.4,8.0,0.2)
+#v     = '1616'
+#beta  = np.arange(3.0,8.0,0.2)
+v     = '1818'
+beta  = np.arange(3.0,8.5,0.5)
+#v     = '2424'
+#beta  = (4.0, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0, 6.25, 6.5, 6.75, 7.0, 7.5, 8.0)
+#v     = '3232'
+#beta  = (4.0, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0, 6.5, 7.0, 8.0)
+#v     = '3636'
+#beta  = (4.5, 5.0, 5.5, 6.0, 6.5, 8.0)
 flav  = '12'
 c     = 0.30                        #chose 0.3 because it has longest autocorr
 L     = int(v[:len(v)/2])           #get L from volume i.e. 12 from 1212

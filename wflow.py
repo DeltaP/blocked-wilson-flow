@@ -16,7 +16,7 @@ from collections import defaultdict
 from scipy import optimize
 
 s  = 2
-dc = -0.03
+dc = -0.005
 error_guess = math.sqrt(0.018**2+0.018**2)
 
 #fitfunc = lambda c, x: -1 / (c[0] + c[1]*(12.0/x) + c[2]*(12.0/x)**2 + c[3]*(12.0/x)**3 - x/12.0)
@@ -41,7 +41,7 @@ g2       = defaultdict(dict)
 g2_err   = defaultdict(dict)
 dg2      = defaultdict(dict)
 coeff    = defaultdict(dict)
-pcolor   = {'88': 'b', '1212': 'g', '1616': 'r', '2424': 'c', '3232': 'm', '4848': 'y'}
+pcolor   = {'88': 'b', '1212': 'g', '1616': 'r', '1818': 'k', '2424': 'c', '3232': 'm', '3636': 'y'}
 
 fig1=plt.figure()
 figleft=plt.figure()
@@ -67,7 +67,7 @@ for volume in vol:
   print betal[volume]
   for b in betal[volume]:
     t2E = np.mean(data[b])
-    t2E_err = scipy.stats.sem(data[b])
+    t2E_err = np.std(data[b])
     g2[(volume,b)] = (128*math.pi**2*t2E)/(3*(3**2-1)*(1+dc))
     g2_err[(volume,b)] = (128*math.pi**2*t2E_err)/(3*(3**2-1)*(1+dc))
 
@@ -88,14 +88,9 @@ for volume in vol:
   splt1.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[volume], label=volume)
   spltleft.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[volume], label=volume)
   spltcenter.errorbar(ax, ay, yerr=ae, linestyle='None', marker='.', color=pcolor[volume], label=volume)
-  if volume == '3232':
-    coeff[volume], success = optimize.leastsq(errfunc2, c2_in[:], args=(ax, ay, ae))
-    splt1.plot(ax, fitfunc2(coeff[volume],ax))
-    spltleft.plot(ax, fitfunc2(coeff[volume],ax))
-    spltcenter.plot(ax, fitfunc2(coeff[volume],ax))
-  if ((volume != '4848')and(volume != '3232')):
+  if (volume != '4848'):
     coeff[volume], success = optimize.leastsq(errfunc, c_in[:], args=(ax, ay, ae))
-    splt1.plot(ax, fitfunc(coeff[volume],ax))
+    splt1.plot(ax, fitfunc(coeff[volume],ax,), color=pcolor[volume])
     spltleft.plot(ax, fitfunc(coeff[volume],ax))
     spltcenter.plot(ax, fitfunc(coeff[volume],ax))
 splt1.legend(loc=3)
@@ -104,6 +99,9 @@ spltcenter.set_xlim(5,7)
 spltcenter.set_ylim(2.5,8)
 spltleft.set_xlim(3.5,5.5)
 spltleft.set_ylim(4.5,12)
+splt1.set_xlabel(r'$\beta$',fontsize=20)
+splt1.set_ylabel(r'$g^2_c(L)$',fontsize=20)
+splt1.set_yscale('log')
 fig1.savefig("plots/wflow.png", format='png')
 figcenter.savefig("plots/center.png", format='png')
 figleft.savefig("plots/left.png", format='png')

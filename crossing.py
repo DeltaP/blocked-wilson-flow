@@ -60,6 +60,8 @@ dg2      = defaultdict(dict)
 coeff    = defaultdict(dict)
 pcolor   = {'66': 'y', '88': 'b', '1212': 'g', '1616': 'r','1818': 'y', '2424': 'c', '3232': 'm', '3636': 'y', '4848': 'y'}
 
+bin_df = pd.read_csv("binsize.csv", index_col=[0,1], skipinitialspace=True)
+
 fig1=plt.figure(1)
 fig2=plt.figure(2)
 for vol in (svol,lvol):
@@ -83,9 +85,20 @@ for vol in (svol,lvol):
 
   betal[vol]=(set(tmpbetal))
   for b in betal[vol]:
-    E = np.mean(data[b])
-    E_err = scipy.stats.sem(data[b])*math.sqrt(10) #temporary hack
-    g2[(vol,b)] = (128*math.pi**2*E*t**2)/(3*(3**2-1)*(1+dc))
+    npdata = np.array(data[b])
+    binsize = int(bin_df.ix[(int(vol),float(b))]['bin'])
+    bindata = npdata[:(npdata.size // binsize) * binsize].reshape(-1, binsize).mean(axis=1) 
+    E     = np.mean(bindata)
+    total = np.sum(bindata)
+    n     = bindata.size - 1
+    accum = 0
+    for x in np.nditer(bindata):
+      jackavg = (total - x) / n
+      diff    = jackavg-E
+      accum   += math.pow(diff,2)
+    N     = float(bindata.size)
+    E_err = math.sqrt((N-1)/N*accum)
+    g2[(vol,b)]     = (128*math.pi**2*E*t**2)/(3*(3**2-1)*(1+dc))
     g2_err[(vol,b)] = (128*math.pi**2*E_err*t**2)/(3*(3**2-1)*(1+dc))
 
     x = []
