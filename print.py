@@ -19,7 +19,7 @@ from collections import defaultdict
 from scipy.optimize import curve_fit
 from scipy import optimize 
 
-parser = argparse.ArgumentParser(description='Wilson Flow Crossing.')
+parser = argparse.ArgumentParser(description='Printer for g^2(c)')
 parser.add_argument('c', metavar='constant', type=float, nargs=1, help='Enter the smearing constant that defines the extent of the smearing you are interested in.')
 parser.add_argument('v', metavar='volume', type=str, nargs=1, help='Enter the volume.')
 args = parser.parse_args()

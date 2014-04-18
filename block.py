@@ -43,8 +43,6 @@ npdata  = np.array(data)       #stores data in pandas series
 print "Length of timeseries:  " + str(npdata.size)
 
 #calculates the jack knife error estimate over a range of block sizes
-#maxbin = int(math.log(npdata.size,2))-1
-#bins = [math.pow(2,x) for x in range(0,maxbin)]
 bins = [(2*x) for x in range(1,(npdata.size//10))]
 jack_err = []
 for binsize in (bins):
